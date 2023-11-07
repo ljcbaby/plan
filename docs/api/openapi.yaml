@@ -1,0 +1,2043 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "培养计划", "description": "", "version": "1.0.0" },
+  "tags": [{ "name": "v1" }, { "name": "v1/课程" }, { "name": "v1/培养方案" }],
+  "paths":
+    {
+      "/v1/courses":
+        {
+          "post":
+            {
+              "summary": "创建课程",
+              "x-apifox-folder": "v1/课程",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/课程"],
+              "parameters": [],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "type": "object",
+                              "properties":
+                                {
+                                  "name":
+                                    { "type": "string", "title": "课程名" },
+                                  "foreignName":
+                                    { "type": "string", "title": "课程外文名" },
+                                  "credit":
+                                    { "type": "integer", "title": "学分" },
+                                  "hoursTotal":
+                                    {
+                                      "oneOf":
+                                        [
+                                          {
+                                            "type": "integer",
+                                            "description": "数字时可校验后五个求和是否对应",
+                                          },
+                                          {
+                                            "type": "string",
+                                            "description": "短学期可能使用",
+                                          },
+                                        ],
+                                      "title": "总学时",
+                                    },
+                                  "hoursLecture":
+                                    { "type": "integer", "title": "讲授" },
+                                  "hoursPractices":
+                                    { "type": "integer", "title": "课程实践" },
+                                  "hoursExperiment":
+                                    { "type": "integer", "title": "实验" },
+                                  "hoursComputer":
+                                    { "type": "integer", "title": "课内上机" },
+                                  "hoursSelf":
+                                    { "type": "integer", "title": "课外上机" },
+                                  "assessment":
+                                    {
+                                      "type": "string",
+                                      "title": "考核方式",
+                                      "description": "下拉选择，X代表“学校组织考试”，Y代表“学院组织考试”，C代表“考查”。",
+                                    },
+                                  "showRemark":
+                                    {
+                                      "type": "string",
+                                      "title": "展示备注",
+                                      "description": "双语、全英文 等",
+                                    },
+                                  "remark":
+                                    { "type": "string", "title": "开课备注" },
+                                  "departmentName":
+                                    { "type": "string", "title": "开课学院" },
+                                  "leaderName":
+                                    { "type": "string", "title": "课程负责人" },
+                                },
+                              "x-apifox-orders": ["01HE4A8EZJ09VGCZPW6A5FB2Y5"],
+                              "x-apifox-refs":
+                                {
+                                  "01HE4A8EZJ09VGCZPW6A5FB2Y5":
+                                    {
+                                      "$ref": "#/components/schemas/course",
+                                      "x-apifox-overrides":
+                                        {
+                                          "id": null,
+                                          "assessment":
+                                            {
+                                              "type": "string",
+                                              "title": "考核方式",
+                                              "description": "下拉选择，X代表“学校组织考试”，Y代表“学院组织考试”，C代表“考查”。",
+                                            },
+                                        },
+                                      "required": [],
+                                    },
+                                },
+                              "x-apifox-ignore-properties":
+                                [
+                                  "name",
+                                  "foreignName",
+                                  "credit",
+                                  "hoursTotal",
+                                  "hoursLecture",
+                                  "hoursPractices",
+                                  "hoursExperiment",
+                                  "hoursComputer",
+                                  "hoursSelf",
+                                  "assessment",
+                                  "showRemark",
+                                  "remark",
+                                  "departmentName",
+                                  "leaderName",
+                                ],
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "201":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                      "data":
+                                        {
+                                          "type":
+                                            [
+                                              "string",
+                                              "integer",
+                                              "boolean",
+                                              "array",
+                                              "object",
+                                              "number",
+                                              "null",
+                                            ],
+                                          "title": "返回数据",
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4ADFJYEZ54VDSMWDRT4182"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4ADFJYEZ54VDSMWDRT4182":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code"],
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-117580792-run",
+              "security": [],
+            },
+          "get":
+            {
+              "summary": "列出/查询课程",
+              "x-apifox-folder": "v1/课程",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "根据参数做like查询",
+              "tags": ["v1/课程"],
+              "parameters":
+                [
+                  {
+                    "name": "pageNum",
+                    "in": "query",
+                    "description": "页数",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "pageSize",
+                    "in": "query",
+                    "description": "页大小，默认50",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "name",
+                    "in": "query",
+                    "description": "",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "foreignName",
+                    "in": "query",
+                    "description": "",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "remark",
+                    "in": "query",
+                    "description": "",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "showRemark",
+                    "in": "query",
+                    "description": "",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "departmentName",
+                    "in": "query",
+                    "description": "",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "leaderName",
+                    "in": "query",
+                    "description": "",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "credit",
+                    "in": "query",
+                    "description": "",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "assessment",
+                    "in": "query",
+                    "description": "",
+                    "required": false,
+                    "example": "",
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                      "data":
+                                        {
+                                          "type": "object",
+                                          "properties":
+                                            {
+                                              "page":
+                                                {
+                                                  "type": "object",
+                                                  "properties":
+                                                    {
+                                                      "pageNumber":
+                                                        { "type": "integer" },
+                                                      "pageSize":
+                                                        { "type": "integer" },
+                                                      "total":
+                                                        { "type": "integer" },
+                                                    },
+                                                  "x-apifox-orders":
+                                                    [
+                                                      "pageNumber",
+                                                      "pageSize",
+                                                      "total",
+                                                    ],
+                                                  "required":
+                                                    [
+                                                      "pageNumber",
+                                                      "pageSize",
+                                                      "total",
+                                                    ],
+                                                  "x-apifox-ignore-properties":
+                                                    [],
+                                                },
+                                              "list":
+                                                {
+                                                  "type": "array",
+                                                  "items":
+                                                    {
+                                                      "$ref": "#/components/schemas/course",
+                                                      "x-apifox-overrides":
+                                                        {
+                                                          "id": null,
+                                                          "assessment":
+                                                            {
+                                                              "type": "string",
+                                                              "title": "考核方式",
+                                                              "description": "下拉选择，X代表“学校组织考试”，Y代表“学院组织考试”，C代表“考查”。",
+                                                            },
+                                                        },
+                                                      "required": [],
+                                                    },
+                                                },
+                                            },
+                                          "title": "返回数据",
+                                          "x-apifox-orders": ["page", "list"],
+                                          "required": ["page", "list"],
+                                          "x-apifox-ignore-properties": [],
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4AWB2JK1BGDYX3MZV15A16"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4AWB2JK1BGDYX3MZV15A16":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code", "data"],
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-117582087-run",
+              "security": [],
+            },
+        },
+      "/v1/courses/{id}":
+        {
+          "delete":
+            {
+              "summary": "删除课程",
+              "x-apifox-folder": "v1/课程",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/课程"],
+              "parameters":
+                [
+                  {
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "204":
+                    {
+                      "description": "删除成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HEJAT3TBK3JKMHZEFP52FRR0"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJAT3TBK3JKMHZEFP52FRR0":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code"],
+                                  "x-apifox-ignore-properties": ["code", "msg"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-117581038-run",
+              "security": [],
+            },
+          "patch":
+            {
+              "summary": "修改课程",
+              "x-apifox-folder": "v1/课程",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/课程"],
+              "parameters":
+                [
+                  {
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "type": "object",
+                              "properties":
+                                {
+                                  "name":
+                                    { "type": "string", "title": "课程名" },
+                                  "foreignName":
+                                    { "type": "string", "title": "课程外文名" },
+                                  "credit":
+                                    { "type": "integer", "title": "学分" },
+                                  "hoursTotal":
+                                    {
+                                      "oneOf":
+                                        [
+                                          {
+                                            "type": "integer",
+                                            "description": "数字时可校验后五个求和是否对应",
+                                          },
+                                          {
+                                            "type": "string",
+                                            "description": "短学期可能使用",
+                                          },
+                                        ],
+                                      "title": "总学时",
+                                    },
+                                  "hoursLecture":
+                                    { "type": "integer", "title": "讲授" },
+                                  "hoursPractices":
+                                    { "type": "integer", "title": "课程实践" },
+                                  "hoursExperiment":
+                                    { "type": "integer", "title": "实验" },
+                                  "hoursComputer":
+                                    { "type": "integer", "title": "课内上机" },
+                                  "hoursSelf":
+                                    { "type": "integer", "title": "课外上机" },
+                                  "assessment":
+                                    {
+                                      "type": "string",
+                                      "title": "考核方式",
+                                      "description": "X代表“学校组织考试”，Y代表“学院组织考试”，C代表“考查”。",
+                                    },
+                                  "showRemark":
+                                    {
+                                      "type": "string",
+                                      "title": "展示备注",
+                                      "description": "双语、全英文 等",
+                                    },
+                                  "remark":
+                                    { "type": "string", "title": "开课备注" },
+                                  "departmentName":
+                                    { "type": "string", "title": "开课学院" },
+                                  "leaderName":
+                                    { "type": "string", "title": "课程负责人" },
+                                },
+                              "x-apifox-orders": ["01HE4ARRRY61GDZ9KBV6HBYX1X"],
+                              "x-apifox-refs":
+                                {
+                                  "01HE4ARRRY61GDZ9KBV6HBYX1X":
+                                    {
+                                      "$ref": "#/components/schemas/course",
+                                      "x-apifox-overrides":
+                                        {
+                                          "id": null,
+                                          "assessment":
+                                            {
+                                              "type": "string",
+                                              "title": "考核方式",
+                                              "description": "下拉选择，X代表“学校组织考试”，Y代表“学院组织考试”，C代表“考查”。",
+                                            },
+                                        },
+                                      "required": [],
+                                    },
+                                },
+                              "x-apifox-ignore-properties":
+                                [
+                                  "name",
+                                  "foreignName",
+                                  "credit",
+                                  "hoursTotal",
+                                  "hoursLecture",
+                                  "hoursPractices",
+                                  "hoursExperiment",
+                                  "hoursComputer",
+                                  "hoursSelf",
+                                  "assessment",
+                                  "showRemark",
+                                  "remark",
+                                  "departmentName",
+                                  "leaderName",
+                                ],
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4AT5P8X4SWEN1FY8WE427V"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4AT5P8X4SWEN1FY8WE427V":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code"],
+                                  "x-apifox-ignore-properties": ["code", "msg"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-117581744-run",
+              "security": [],
+            },
+        },
+      "/v1/courses/files":
+        {
+          "post":
+            {
+              "summary": "导入课程",
+              "x-apifox-folder": "v1/课程",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/课程"],
+              "parameters": [],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/octet-stream":
+                        { "schema": { "type": "string", "format": "binary" } },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        {
+                                          "type": "string",
+                                          "title": "信息",
+                                          "description": "异常信息",
+                                        },
+                                      "data":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回数据",
+                                          "description": "导入成功数据条数",
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4B344F6BHN62QFBRYFFVY9"],
+                                  "required": ["code", "msg", "data"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4B344F6BHN62QFBRYFFVY9":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-117586310-run",
+              "security": [],
+            },
+          "get":
+            {
+              "summary": "导出课程",
+              "x-apifox-folder": "v1/课程",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "接口复用：提供导入模板",
+              "tags": ["v1/课程"],
+              "parameters":
+                [
+                  {
+                    "name": "content",
+                    "in": "query",
+                    "description": "null 下载导入模板，all 下载全部，默认 null",
+                    "required": false,
+                    "example": "null, all",
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                      "data":
+                                        {
+                                          "type": "string",
+                                          "title": "返回数据",
+                                          "description": "下载地址",
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4BHTQQ2XPPWT07SBWTQC7Z"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4BHTQQ2XPPWT07SBWTQC7Z":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code", "data"],
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-117591492-run",
+              "security": [],
+            },
+        },
+      "/v1/download/{filename}":
+        {
+          "get":
+            {
+              "summary": "下载",
+              "x-apifox-folder": "v1",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "共用下载接口",
+              "tags": ["v1"],
+              "parameters":
+                [
+                  {
+                    "name": "filename",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "*/*":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-ignore-properties": [],
+                                  "x-apifox-orders": [],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-121239083-run",
+              "security": [],
+            },
+        },
+      "/v1/programs":
+        {
+          "post":
+            {
+              "summary": "创建方案",
+              "x-apifox-folder": "v1/培养方案",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/培养方案"],
+              "parameters": [],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "type": "object",
+                              "properties":
+                                {
+                                  "name":
+                                    { "type": "string", "title": "计划名" },
+                                  "major":
+                                    { "type": "string", "title": "专业" },
+                                  "department":
+                                    { "type": "string", "title": "描述" },
+                                  "dependencyId":
+                                    { "type": "string", "title": "依赖ID" },
+                                  "grade":
+                                    { "type": "string", "title": "年级" },
+                                },
+                              "x-apifox-orders": ["01HE4BV5E6253TH3JMWA5NWG7N"],
+                              "x-apifox-refs":
+                                {
+                                  "01HE4BV5E6253TH3JMWA5NWG7N":
+                                    {
+                                      "$ref": "#/components/schemas/program",
+                                      "x-apifox-overrides":
+                                        {
+                                          "content": null,
+                                          "id": null,
+                                          "tags": null,
+                                        },
+                                    },
+                                },
+                              "x-apifox-ignore-properties":
+                                [
+                                  "name",
+                                  "major",
+                                  "department",
+                                  "dependencyId",
+                                  "grade",
+                                ],
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "201":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                      "data":
+                                        {
+                                          "$ref": "#/components/schemas/program",
+                                          "x-apifox-overrides":
+                                            {
+                                              "content": null,
+                                              "id": null,
+                                              "tags": null,
+                                            },
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4BWJH5HWH4ZD6P9CF1Y0M4"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4BWJH5HWH4ZD6P9CF1Y0M4":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code", "data"],
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-121240332-run",
+              "security": [],
+            },
+          "patch":
+            {
+              "summary": "修改方案",
+              "x-apifox-folder": "v1/培养方案",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/培养方案"],
+              "parameters": [],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "type": "object",
+                              "properties":
+                                {
+                                  "name":
+                                    { "type": "string", "title": "计划名" },
+                                  "major":
+                                    { "type": "string", "title": "专业" },
+                                  "department":
+                                    { "type": "string", "title": "描述" },
+                                  "dependencyId":
+                                    { "type": "string", "title": "依赖ID" },
+                                  "tags":
+                                    {
+                                      "type": "array",
+                                      "items": { "type": "string" },
+                                      "title": "标签",
+                                    },
+                                  "grade":
+                                    { "type": "string", "title": "年级" },
+                                  "content":
+                                    {
+                                      "type": "array",
+                                      "items":
+                                        { "$ref": "#/components/schemas/node" },
+                                      "title": "内容",
+                                    },
+                                },
+                              "x-apifox-orders": ["01HE4BV5E6253TH3JMWA5NWG7N"],
+                              "x-apifox-refs":
+                                {
+                                  "01HE4BV5E6253TH3JMWA5NWG7N":
+                                    {
+                                      "$ref": "#/components/schemas/program",
+                                      "x-apifox-overrides":
+                                        {
+                                          "content": null,
+                                          "id": null,
+                                          "tags": null,
+                                        },
+                                    },
+                                },
+                              "x-apifox-ignore-properties":
+                                [
+                                  "name",
+                                  "major",
+                                  "department",
+                                  "dependencyId",
+                                  "tags",
+                                  "grade",
+                                  "content",
+                                ],
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4BWJH5HWH4ZD6P9CF1Y0M4"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4BWJH5HWH4ZD6P9CF1Y0M4":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code"],
+                                  "x-apifox-ignore-properties": ["code", "msg"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-121240715-run",
+              "security": [],
+            },
+          "get":
+            {
+              "summary": "获取方案列表",
+              "x-apifox-folder": "v1/培养方案",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/培养方案"],
+              "parameters": [],
+              "responses":
+                {
+                  "201":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                      "data":
+                                        {
+                                          "type": "array",
+                                          "items":
+                                            {
+                                              "type": "object",
+                                              "x-apifox-refs":
+                                                {
+                                                  "01HE4C6ZR122ACW6FMSE3S14FB":
+                                                    {
+                                                      "$ref": "#/components/schemas/program",
+                                                      "x-apifox-overrides":
+                                                        {
+                                                          "content": null,
+                                                          "id": null,
+                                                          "tags": null,
+                                                        },
+                                                    },
+                                                },
+                                              "x-apifox-orders":
+                                                ["01HE4C6ZR122ACW6FMSE3S14FB"],
+                                              "properties":
+                                                {
+                                                  "id":
+                                                    {
+                                                      "type": "string",
+                                                      "title": "ID",
+                                                    },
+                                                  "name":
+                                                    {
+                                                      "type": "string",
+                                                      "title": "计划名",
+                                                    },
+                                                  "major":
+                                                    {
+                                                      "type": "string",
+                                                      "title": "专业",
+                                                    },
+                                                  "department":
+                                                    {
+                                                      "type": "string",
+                                                      "title": "描述",
+                                                    },
+                                                  "dependencyId":
+                                                    {
+                                                      "type": "string",
+                                                      "title": "依赖ID",
+                                                    },
+                                                  "tags":
+                                                    {
+                                                      "type": "array",
+                                                      "items":
+                                                        { "type": "string" },
+                                                      "title": "标签",
+                                                    },
+                                                  "grade":
+                                                    {
+                                                      "type": "string",
+                                                      "title": "年级",
+                                                    },
+                                                },
+                                              "x-apifox-ignore-properties":
+                                                [
+                                                  "id",
+                                                  "name",
+                                                  "major",
+                                                  "department",
+                                                  "dependencyId",
+                                                  "tags",
+                                                  "grade",
+                                                ],
+                                            },
+                                          "title": "返回数据",
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4BWJH5HWH4ZD6P9CF1Y0M4"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4BWJH5HWH4ZD6P9CF1Y0M4":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code", "data"],
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-121242823-run",
+              "security": [],
+            },
+        },
+      "/v1/programs/{id}":
+        {
+          "delete":
+            {
+              "summary": "删除方案",
+              "x-apifox-folder": "v1/培养方案",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/培养方案"],
+              "parameters":
+                [
+                  {
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "204":
+                    {
+                      "description": "删除成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HEJAVVNW75YCCZKZPKQYPY4Z"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJAVVNW75YCCZKZPKQYPY4Z":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code"],
+                                  "x-apifox-ignore-properties": ["code", "msg"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-121240377-run",
+              "security": [],
+            },
+          "get":
+            {
+              "summary": "获取方案",
+              "x-apifox-folder": "v1/培养方案",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/培养方案"],
+              "parameters":
+                [
+                  {
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "content",
+                    "in": "query",
+                    "description": "设为1则包含content，默认不包含",
+                    "required": false,
+                    "example": "1",
+                    "schema": { "type": "integer" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                      "data":
+                                        {
+                                          "$ref": "#/components/schemas/program",
+                                          "x-apifox-overrides":
+                                            {
+                                              "content": null,
+                                              "id": null,
+                                              "tags": null,
+                                            },
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4BWJH5HWH4ZD6P9CF1Y0M4"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4BWJH5HWH4ZD6P9CF1Y0M4":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code", "data"],
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-121242570-run",
+              "security": [],
+            },
+        },
+      "/v1/programs/{id}/files":
+        {
+          "get":
+            {
+              "summary": "下载方案",
+              "x-apifox-folder": "v1/培养方案",
+              "x-apifox-status": "pending",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/培养方案"],
+              "parameters":
+                [
+                  {
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                      "data":
+                                        {
+                                          "type": "string",
+                                          "title": "返回数据",
+                                          "description": "下载地址",
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4BWJH5HWH4ZD6P9CF1Y0M4"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4BWJH5HWH4ZD6P9CF1Y0M4":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code", "data"],
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-121243643-run",
+              "security": [],
+            },
+        },
+      "/v1/programs/{id}/calculate":
+        {
+          "get":
+            {
+              "summary": "获取方案计算",
+              "x-apifox-folder": "v1/培养方案",
+              "x-apifox-status": "designing",
+              "deprecated": false,
+              "description": "",
+              "tags": ["v1/培养方案"],
+              "parameters":
+                [
+                  {
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "成功",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "object",
+                                  "properties":
+                                    {
+                                      "code":
+                                        {
+                                          "type": "integer",
+                                          "title": "返回码",
+                                        },
+                                      "msg":
+                                        { "type": "string", "title": "信息" },
+                                      "data":
+                                        {
+                                          "type":
+                                            [
+                                              "string",
+                                              "integer",
+                                              "boolean",
+                                              "array",
+                                              "object",
+                                              "number",
+                                              "null",
+                                            ],
+                                          "title": "返回数据",
+                                        },
+                                    },
+                                  "x-apifox-orders":
+                                    ["01HE4BWJH5HWH4ZD6P9CF1Y0M4"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HE4BWJH5HWH4ZD6P9CF1Y0M4":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                  "required": ["code"],
+                                  "x-apifox-ignore-properties":
+                                    ["code", "msg", "data"],
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "异常",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "title": "",
+                                  "type": "object",
+                                  "properties": {},
+                                  "x-apifox-orders":
+                                    ["01HEJB6DZP0YVKHBZ8TV7KGQE5"],
+                                  "x-apifox-refs":
+                                    {
+                                      "01HEJB6DZP0YVKHBZ8TV7KGQE5":
+                                        {
+                                          "$ref": "#/components/schemas/return",
+                                          "x-apifox-overrides": {},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+              "x-run-in-apifox": "https://apifox.com/web/project/3435890/apis/api-121244529-run",
+              "security": [],
+            },
+        },
+    },
+  "components":
+    {
+      "schemas":
+        {
+          "return":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "code": { "type": "integer", "title": "返回码" },
+                  "msg": { "type": "string", "title": "信息" },
+                  "data":
+                    {
+                      "type":
+                        [
+                          "string",
+                          "integer",
+                          "boolean",
+                          "array",
+                          "object",
+                          "number",
+                          "null",
+                        ],
+                      "title": "返回数据",
+                    },
+                },
+              "x-apifox-orders": ["code", "msg", "data"],
+              "required": ["code"],
+              "title": "返回体",
+              "x-apifox-ignore-properties": [],
+              "x-apifox-folder": "",
+            },
+          "program":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "id": { "type": "string", "title": "ID" },
+                  "name": { "type": "string", "title": "计划名" },
+                  "major": { "type": "string", "title": "专业" },
+                  "department": { "type": "string", "title": "描述" },
+                  "dependencyId": { "type": "string", "title": "依赖ID" },
+                  "tags":
+                    {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "title": "标签",
+                    },
+                  "grade": { "type": "string", "title": "年级" },
+                  "content":
+                    {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/node" },
+                      "title": "内容",
+                    },
+                },
+              "x-apifox-orders":
+                [
+                  "id",
+                  "name",
+                  "major",
+                  "department",
+                  "dependencyId",
+                  "tags",
+                  "grade",
+                  "content",
+                ],
+              "title": "培养计划",
+              "x-apifox-ignore-properties": [],
+              "x-apifox-folder": "",
+            },
+          "node-course":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "courseId": { "type": "string", "title": "课程号" },
+                  "semester": { "type": "string", "title": "学期" },
+                  "beginWeek": { "type": "string", "title": "起始周" },
+                },
+              "x-apifox-orders": ["courseId", "semester", "beginWeek"],
+              "title": "节点-课程",
+              "x-apifox-ignore-properties": [],
+              "x-apifox-folder": "",
+            },
+          "node-node":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "name": { "type": "string", "title": "节点名称" },
+                  "requirement":
+                    {
+                      "type": "object",
+                      "properties":
+                        {
+                          "minCredit":
+                            { "type": "integer", "title": "最低学分" },
+                          "minCourse":
+                            { "type": "integer", "title": "最少修习门数" },
+                        },
+                      "x-apifox-orders": ["minCredit", "minCourse"],
+                      "title": "要求",
+                      "x-apifox-ignore-properties": [],
+                    },
+                  "remark": { "type": "string", "title": "备注" },
+                  "content":
+                    {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/node" },
+                      "title": "包含节点/课程",
+                    },
+                },
+              "x-apifox-orders": ["name", "requirement", "remark", "content"],
+              "title": "节点-节点",
+              "x-apifox-ignore-properties": [],
+              "x-apifox-folder": "",
+            },
+          "node":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "id": { "type": "string", "title": "节点ID" },
+                  "type":
+                    {
+                      "type": "string",
+                      "title": "类型",
+                      "description": "node or course",
+                    },
+                  "tags":
+                    {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "title": "标签",
+                    },
+                  "name": { "type": "string", "title": "节点名称" },
+                  "requirement":
+                    {
+                      "type": "object",
+                      "properties":
+                        {
+                          "minCredit":
+                            { "type": "integer", "title": "最低学分" },
+                          "minCourse":
+                            { "type": "integer", "title": "最少修习门数" },
+                        },
+                      "x-apifox-orders": ["minCredit", "minCourse"],
+                      "title": "要求",
+                      "x-apifox-ignore-properties": [],
+                    },
+                  "remark": { "type": "string", "title": "备注" },
+                  "content":
+                    {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/node" },
+                      "title": "包含节点/课程",
+                    },
+                  "courseId": { "type": "string", "title": "课程号" },
+                  "semester": { "type": "string", "title": "学期" },
+                  "beginWeek": { "type": "string", "title": "起始周" },
+                },
+              "x-apifox-orders":
+                [
+                  "id",
+                  "type",
+                  "tags",
+                  "01HD0CNF69V068SAQKW4Z8H71S",
+                  "01HD0CP12KB2EDYMF86RZV7JVM",
+                ],
+              "title": "节点",
+              "x-apifox-refs":
+                {
+                  "01HD0CNF69V068SAQKW4Z8H71S":
+                    { "$ref": "#/components/schemas/node-node" },
+                  "01HD0CP12KB2EDYMF86RZV7JVM":
+                    { "$ref": "#/components/schemas/node-course" },
+                },
+              "x-apifox-ignore-properties":
+                [
+                  "name",
+                  "requirement",
+                  "remark",
+                  "content",
+                  "courseId",
+                  "semester",
+                  "beginWeek",
+                ],
+              "x-apifox-folder": "",
+            },
+          "course":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "id": { "type": "string", "title": "课程号" },
+                  "name": { "type": "string", "title": "课程名" },
+                  "foreignName": { "type": "string", "title": "课程外文名" },
+                  "credit": { "type": "integer", "title": "学分" },
+                  "hoursTotal":
+                    {
+                      "oneOf":
+                        [
+                          {
+                            "type": "integer",
+                            "description": "数字时可校验后五个求和是否对应",
+                          },
+                          { "type": "string", "description": "短学期可能使用" },
+                        ],
+                      "title": "总学时",
+                    },
+                  "hoursLecture": { "type": "integer", "title": "讲授" },
+                  "hoursPractices": { "type": "integer", "title": "课程实践" },
+                  "hoursExperiment": { "type": "integer", "title": "实验" },
+                  "hoursComputer": { "type": "integer", "title": "课内上机" },
+                  "hoursSelf": { "type": "integer", "title": "课外上机" },
+                  "assessment":
+                    {
+                      "type": "string",
+                      "title": "考核方式",
+                      "description": "X代表“学校组织考试”，Y代表“学院组织考试”，C代表“考查”。",
+                    },
+                  "showRemark":
+                    {
+                      "type": "string",
+                      "title": "展示备注",
+                      "description": "双语、全英文 等",
+                    },
+                  "remark": { "type": "string", "title": "开课备注" },
+                  "departmentName": { "type": "string", "title": "开课学院" },
+                  "leaderName": { "type": "string", "title": "课程负责人" },
+                },
+              "x-apifox-orders":
+                [
+                  "id",
+                  "name",
+                  "foreignName",
+                  "credit",
+                  "hoursTotal",
+                  "hoursLecture",
+                  "hoursPractices",
+                  "hoursExperiment",
+                  "hoursComputer",
+                  "hoursSelf",
+                  "assessment",
+                  "showRemark",
+                  "remark",
+                  "departmentName",
+                  "leaderName",
+                ],
+              "title": "课程",
+              "x-apifox-ignore-properties": [],
+              "x-apifox-folder": "",
+            },
+        },
+      "securitySchemes": {},
+    },
+  "servers": [],
+}
