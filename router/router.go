@@ -40,7 +40,7 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/programs/:id/files", Controller.Program.GetProgramFile)
 
 		// Public
-		v1.Static("/download", config.Conf.Download.SavePath)
+		v1.GET("/download/:filename", Controller.DownloadFile)
 	}
 
 	return r
