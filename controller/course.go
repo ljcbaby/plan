@@ -5,15 +5,40 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ljcbaby/plan/model"
+	"github.com/ljcbaby/plan/service"
 )
 
 type CourseController struct{}
 
 func (c *CourseController) CreateCourse(ctx *gin.Context) {
-	ctx.JSON(http.StatusServiceUnavailable, model.Response{
-		Code: -1,
-		Msg:  "Under construction.",
-	})
+	var course model.Course
+	if err := ctx.ShouldBindJSON(&course); err != nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	t, ok := course.HoursTotal.(int)
+	if ok {
+		if t != *course.HoursLecture+*course.HoursPractices+*course.HoursExperiment+*course.HoursComputer+*course.HoursSelf {
+			ctx.JSON(http.StatusBadRequest, model.Response{
+				Code: 1001,
+				Msg:  "Hours total is not equal to the sum of other hours.",
+			})
+			return
+		}
+	}
+
+	cs := &service.CourseService{}
+	_, err := cs.CreateCourse(&course)
+	if err != nil {
+		returnMySQLError(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, Success(nil))
 }
 
 func (c *CourseController) DeleteCourse(ctx *gin.Context) {

@@ -1,7 +1,6 @@
 package router
 
 import (
-	"github.com/ljcbaby/plan/config"
 	"github.com/ljcbaby/plan/controller"
 
 	"github.com/gin-gonic/gin"

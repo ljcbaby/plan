@@ -47,6 +47,14 @@ func (c *Controller) DownloadFile(ctx *gin.Context) {
 	ctx.File(filepath)
 }
 
+func Success(data interface{}) *model.Response {
+	return &model.Response{
+		Code: 0,
+		Data: data,
+		Msg:  "Success.",
+	}
+}
+
 func returnMySQLError(ctx *gin.Context, err error) {
 	ctx.JSON(http.StatusInternalServerError, model.Response{
 		Code: 1000,
