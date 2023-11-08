@@ -29,3 +29,13 @@ func (c *CourseService) CreateCourse(course *model.Course) (uint, error) {
 
 	return course.ID, nil
 }
+
+func (c *CourseService) DeleteCourse(id uint) error {
+	db := database.DB
+
+	if err := db.Delete(&model.Course{}, id).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
