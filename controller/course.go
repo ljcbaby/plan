@@ -21,7 +21,15 @@ func (c *CourseController) CreateCourse(ctx *gin.Context) {
 		return
 	}
 
-	t, ok := course.HoursTotal.(int)
+	if course.Code == nil || course.Name == nil || course.ForeignName == nil || course.Credit == nil || course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil || course.LeaderName == nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  "Required fields cannot be empty.",
+		})
+		return
+	}
+
+	t, ok := (*course.HoursTotal).(int)
 	if ok {
 		if t != *course.HoursLecture+*course.HoursPractices+*course.HoursExperiment+*course.HoursComputer+*course.HoursSelf {
 			ctx.JSON(http.StatusBadRequest, model.Response{

@@ -13,12 +13,12 @@ type CourseService struct{}
 func (c *CourseService) CreateCourse(course *model.Course) (uint, error) {
 	db := database.DB
 
-	t, ok := course.HoursTotal.(int)
+	t, ok := (*course.HoursTotal).(int)
 	if ok {
-		course.HoursTotal = strconv.Itoa(t)
+		*course.HoursTotal = strconv.Itoa(t)
 	}
 
-	_, ok = course.HoursTotal.(string)
+	_, ok = (*course.HoursTotal).(string)
 	if !ok {
 		return 0, errors.New("errTypeParse")
 	}
@@ -27,7 +27,7 @@ func (c *CourseService) CreateCourse(course *model.Course) (uint, error) {
 		return 0, err
 	}
 
-	return course.ID, nil
+	return *course.ID, nil
 }
 
 func (c *CourseService) DeleteCourse(id uint) error {
