@@ -35,6 +35,7 @@ func (c *Course) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	c.HoursTotal = new(interface{})
 	if len(aux.HoursTotal) > 0 {
 		if aux.HoursTotal[0] == '"' {
 			var hoursTotal string

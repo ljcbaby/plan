@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ljcbaby/plan/model"
@@ -21,7 +22,9 @@ func (c *CourseController) CreateCourse(ctx *gin.Context) {
 		return
 	}
 
-	if course.Code == nil || course.Name == nil || course.ForeignName == nil || course.Credit == nil || course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil || course.LeaderName == nil {
+	if course.Code == nil || course.Name == nil || course.ForeignName == nil || course.Credit == nil ||
+		*course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil ||
+		course.LeaderName == nil {
 		ctx.JSON(http.StatusBadRequest, model.Response{
 			Code: 1001,
 			Msg:  "Required fields cannot be empty.",
@@ -31,10 +34,35 @@ func (c *CourseController) CreateCourse(ctx *gin.Context) {
 
 	t, ok := (*course.HoursTotal).(int)
 	if ok {
-		if t != *course.HoursLecture+*course.HoursPractices+*course.HoursExperiment+*course.HoursComputer+*course.HoursSelf {
+		var sum int
+		if course.HoursLecture != nil {
+			sum += *course.HoursLecture
+		}
+		if course.HoursPractices != nil {
+			sum += *course.HoursPractices
+		}
+		if course.HoursExperiment != nil {
+			sum += *course.HoursExperiment
+		}
+		if course.HoursComputer != nil {
+			sum += *course.HoursComputer
+		}
+		if course.HoursSelf != nil {
+			sum += *course.HoursSelf
+		}
+		if t != sum {
 			ctx.JSON(http.StatusBadRequest, model.Response{
 				Code: 1001,
 				Msg:  "Hours total is not equal to the sum of other hours.",
+			})
+			return
+		}
+	} else {
+		if !(course.HoursLecture == nil && course.HoursPractices == nil && course.HoursExperiment == nil &&
+			course.HoursComputer == nil && course.HoursSelf == nil) {
+			ctx.JSON(http.StatusBadRequest, model.Response{
+				Code: 1001,
+				Msg:  "Hours not set properly.",
 			})
 			return
 		}
@@ -43,6 +71,13 @@ func (c *CourseController) CreateCourse(ctx *gin.Context) {
 	cs := &service.CourseService{}
 	_, err := cs.CreateCourse(&course)
 	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			ctx.JSON(http.StatusBadRequest, model.Response{
+				Code: 1002,
+				Msg:  *course.Code + " already exists.",
+			})
+			return
+		}
 		returnMySQLError(ctx, err)
 		return
 	}
