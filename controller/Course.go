@@ -106,10 +106,46 @@ func (c *CourseController) DeleteCourse(ctx *gin.Context) {
 }
 
 func (c *CourseController) UpdateCourse(ctx *gin.Context) {
-	ctx.JSON(http.StatusServiceUnavailable, model.Response{
-		Code: -1,
-		Msg:  "Under construction.",
-	})
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	var course model.Course
+	if err := ctx.ShouldBindJSON(&course); err != nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	cs := &service.CourseService{}
+	err = cs.UpdateCourse(uint(id), &course)
+	if err != nil {
+		if err.Error() == "record not found" {
+			ctx.JSON(http.StatusBadRequest, model.Response{
+				Code: 1001,
+				Msg:  "Course not found.",
+			})
+			return
+		}
+		if err.Error() == "errHoursTotal" {
+			ctx.JSON(http.StatusBadRequest, model.Response{
+				Code: 1001,
+				Msg:  "Hours not set properly.",
+			})
+			return
+		}
+		returnMySQLError(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, Success(nil))
 }
 
 func (c *CourseController) GetCourseList(ctx *gin.Context) {
