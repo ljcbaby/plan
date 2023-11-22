@@ -149,10 +149,77 @@ func (c *CourseController) UpdateCourse(ctx *gin.Context) {
 }
 
 func (c *CourseController) GetCourseList(ctx *gin.Context) {
-	ctx.JSON(http.StatusServiceUnavailable, model.Response{
-		Code: -1,
-		Msg:  "Under construction.",
-	})
+	var page model.Page
+	page.Current, _ = strconv.Atoi(ctx.DefaultQuery("current", "1"))
+	page.PageSize, _ = strconv.Atoi(ctx.DefaultQuery("pageSize", "50"))
+	if page.Current < 1 || page.PageSize < 1 {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  "Page meta error.",
+		})
+		return
+	}
+
+	var course model.Course
+	var t string
+	t = ctx.DefaultQuery("code", "")
+	if t != "" {
+		course.Code = new(string)
+		*course.Code = t
+	}
+	t = ctx.DefaultQuery("name", "")
+	if t != "" {
+		course.Name = new(string)
+		*course.Name = t
+	}
+	t = ctx.DefaultQuery("foreignName", "")
+	if t != "" {
+		course.ForeignName = new(string)
+		*course.ForeignName = t
+	}
+	t = ctx.DefaultQuery("remark", "")
+	if t != "" {
+		course.Remark = new(string)
+		*course.Remark = t
+	}
+	t = ctx.DefaultQuery("showRemark", "")
+	if t != "" {
+		course.ShowRemark = new(string)
+		*course.ShowRemark = t
+	}
+	t = ctx.DefaultQuery("departmentName", "")
+	if t != "" {
+		course.DepartmentName = new(string)
+		*course.DepartmentName = t
+	}
+	t = ctx.DefaultQuery("leaderName", "")
+	if t != "" {
+		course.LeaderName = new(string)
+		*course.LeaderName = t
+	}
+	t = ctx.DefaultQuery("assessment", "")
+	if t != "" {
+		course.Assessment = new(string)
+		*course.Assessment = t
+	}
+	credit, err := strconv.ParseFloat(ctx.DefaultQuery("credit", ""), 64)
+	if err == nil {
+		course.Credit = new(float64)
+		*course.Credit = credit
+	}
+
+	cs := &service.CourseService{}
+	var courses []model.Course
+	err = cs.GetCourseList(&page, &course, &courses)
+	if err != nil {
+		returnMySQLError(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, Success(gin.H{
+		"page": page,
+		"list": courses,
+	}))
 }
 
 func (c *CourseController) UploadCourseFile(ctx *gin.Context) {

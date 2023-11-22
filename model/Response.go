@@ -6,3 +6,9 @@ type Response struct {
 	Data interface{} `json:"data,omitempty"` // 返回数据
 	Msg  string      `json:"msg"`            // 信息
 }
+
+type Page struct {
+	Current  int   `json:"current"`
+	PageSize int   `json:"pageSize"`
+	Total    int64 `json:"total"`
+}

@@ -1,7 +1,9 @@
 package service
 
 import (
+	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/ljcbaby/plan/database"
 	"github.com/ljcbaby/plan/model"
@@ -220,6 +222,78 @@ func (c *CourseService) UpdateCourse(id uint, course *model.Course) error {
 	}
 
 	tx.Commit()
+
+	return nil
+}
+
+func (c *CourseService) GetCourseList(page *model.Page, r *model.Course, courses *[]model.Course) error {
+	db := database.DB
+
+	if r.Code != nil {
+		db = db.Where("code LIKE ?", "%"+*r.Code+"%")
+	}
+	if r.Name != nil {
+		db = db.Where("name LIKE ?", "%"+*r.Name+"%")
+	}
+	if r.ForeignName != nil {
+		db = db.Where("foreign_name LIKE ?", "%"+*r.ForeignName+"%")
+	}
+	if r.Remark != nil {
+		db = db.Where("remark LIKE ?", "%"+*r.Remark+"%")
+	}
+	if r.ShowRemark != nil {
+		db = db.Where("show_remark LIKE ?", "%"+*r.ShowRemark+"%")
+	}
+	if r.DepartmentName != nil {
+		db = db.Where("department_name LIKE ?", "%"+*r.DepartmentName+"%")
+	}
+	if r.LeaderName != nil {
+		db = db.Where("leader_name LIKE ?", "%"+*r.LeaderName+"%")
+	}
+	if r.Assessment != nil {
+		db = db.Where("assessment = ?", *r.Assessment)
+	}
+	if r.Credit != nil {
+		db = db.Where("credit LIKE ?", fmt.Sprintf("%f", *r.Credit)+"%")
+	}
+
+	if err := db.Model(&model.Course{}).Count(&page.Total).Error; err != nil {
+		return err
+	}
+
+	if err := db.Offset((page.Current - 1) * page.PageSize).Limit(page.PageSize).Find(courses).Error; err != nil {
+		return err
+	}
+
+	for i := 0; i < len(*courses); i++ {
+		db := database.DB
+		var t sql.NullString
+		if err := db.Model(&model.Course{}).Where("id = ?", (*courses)[i].ID).Select("hours_total").Scan(&t).Error; err != nil {
+			return err
+		}
+		(*courses)[i].HoursTotal = new(interface{})
+		if t.Valid {
+			*(*courses)[i].HoursTotal = t.String
+		} else {
+			var sum int
+			if (*courses)[i].HoursLecture != nil {
+				sum += *(*courses)[i].HoursLecture
+			}
+			if (*courses)[i].HoursPractices != nil {
+				sum += *(*courses)[i].HoursPractices
+			}
+			if (*courses)[i].HoursExperiment != nil {
+				sum += *(*courses)[i].HoursExperiment
+			}
+			if (*courses)[i].HoursComputer != nil {
+				sum += *(*courses)[i].HoursComputer
+			}
+			if (*courses)[i].HoursSelf != nil {
+				sum += *(*courses)[i].HoursSelf
+			}
+			*(*courses)[i].HoursTotal = sum
+		}
+	}
 
 	return nil
 }
