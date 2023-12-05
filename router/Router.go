@@ -15,6 +15,9 @@ func SetupRouter() *gin.Engine {
 	// Create controller
 	Controller := &controller.Controller{}
 
+	// Use middleware CORS
+	r.Use(middleware.CORS())
+
 	// Index
 	r.GET("/", Controller.Index)
 
