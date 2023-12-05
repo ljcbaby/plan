@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/ljcbaby/plan/controller"
+	"github.com/ljcbaby/plan/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -40,6 +41,10 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/programs/:id/calculate", Controller.Program.CalculateProgram)
 		v1.GET("/programs", Controller.Program.GetProgramList)
 		v1.GET("/programs/:id/files", Controller.Program.GetProgramFile)
+
+		// Tag
+		v1.GET("/tags", Controller.GetTags)
+		v1.PUT("/tags", Controller.PutTags)
 
 		// Public
 		v1.GET("/download/:filename", Controller.DownloadFile)
