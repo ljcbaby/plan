@@ -9,12 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ljcbaby/plan/config"
 	"github.com/ljcbaby/plan/model"
-	"github.com/ljcbaby/plan/service"
 )
 
 type Controller struct {
 	Course  *CourseController
 	Program *ProgramController
+	Tag     *TagController
 }
 
 func (c *Controller) Index(ctx *gin.Context) {
@@ -46,37 +46,6 @@ func (c *Controller) DownloadFile(ctx *gin.Context) {
 	ctx.Header("Content-Length", strconv.FormatInt(fileInfo.Size(), 10))
 
 	ctx.File(filepath)
-}
-
-func (c *Controller) GetTags(ctx *gin.Context) {
-	var tags model.Tag
-
-	ts := service.TagService{}
-	if err := ts.GetTags(&tags); err != nil {
-		returnMySQLError(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, Success(tags))
-}
-
-func (c *Controller) PutTags(ctx *gin.Context) {
-	var tags model.Tag
-	if err := ctx.ShouldBindJSON(&tags); err != nil {
-		ctx.JSON(http.StatusBadRequest, model.Response{
-			Code: 1001,
-			Msg:  err.Error(),
-		})
-		return
-	}
-
-	ts := service.TagService{}
-	if err := ts.UpdateTags(&tags); err != nil {
-		returnMySQLError(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, Success(nil))
 }
 
 func Success(data interface{}) *model.Response {

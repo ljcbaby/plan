@@ -1,8 +1,7 @@
 package model
 
-import "encoding/json"
-
 // 标签
 type Tag struct {
-	Tags json.RawMessage `gorm:"type:json" json:"tags,omitempty"` // 标签
+	ID  *uint64 `json:"id,omitempty"`
+	Tag *string `json:"tag,omitempty"`
 }

@@ -7,20 +7,41 @@ import (
 
 type TagService struct{}
 
-func (s *TagService) GetTags(tags *model.Tag) error {
+func (s *TagService) CreateTag(tag *model.Tag) error {
 	db := database.DB
 
-	if err := db.Where("id = ?", 1).First(tags).Error; err != nil {
+	if err := db.Create(tag).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *TagService) UpdateTags(tags *model.Tag) error {
+func (s *TagService) GetTagList() ([]model.Tag, error) {
 	db := database.DB
 
-	if err := db.Table("tags").Where("id = ?", 1).Updates(tags).Error; err != nil {
+	var tags []model.Tag
+	if err := db.Find(&tags).Error; err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
+
+func (s *TagService) DeleteTag(id uint64) error {
+	db := database.DB
+
+	if err := db.Delete(&model.Tag{}, id).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *TagService) UpdateTag(tag *model.Tag) error {
+	db := database.DB
+
+	if err := db.Save(tag).Error; err != nil {
 		return err
 	}
 

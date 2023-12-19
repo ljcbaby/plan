@@ -43,8 +43,10 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/programs/:id/files", Controller.Program.GetProgramFile)
 
 		// Tag
-		v1.GET("/tags", Controller.GetTags)
-		v1.PUT("/tags", Controller.PutTags)
+		v1.POST("/tags", Controller.Tag.CreateTag)
+		v1.GET("/tags", Controller.Tag.GetTagList)
+		v1.DELETE("/tags/:id", Controller.Tag.DeleteTag)
+		v1.PUT("/tags/:id", Controller.Tag.UpdateTag)
 
 		// Public
 		v1.GET("/download/:filename", Controller.DownloadFile)
