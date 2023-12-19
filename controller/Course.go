@@ -149,9 +149,17 @@ func (c *CourseController) UpdateCourse(ctx *gin.Context) {
 }
 
 func (c *CourseController) GetCourseList(ctx *gin.Context) {
+	cur := ctx.Query("current")
+	if cur == "" {
+		cur = "1"
+	}
+	pageSize := ctx.Query("pageSize")
+	if pageSize == "" {
+		pageSize = "50"
+	}
 	var page model.Page
-	page.Current, _ = strconv.Atoi(ctx.DefaultQuery("current", "1"))
-	page.PageSize, _ = strconv.Atoi(ctx.DefaultQuery("pageSize", "50"))
+	page.Current, _ = strconv.Atoi(cur)
+	page.PageSize, _ = strconv.Atoi(pageSize)
 	if page.Current < 1 || page.PageSize < 1 {
 		ctx.JSON(http.StatusBadRequest, model.Response{
 			Code: 1001,
@@ -162,47 +170,47 @@ func (c *CourseController) GetCourseList(ctx *gin.Context) {
 
 	var course model.Course
 	var t string
-	t = ctx.DefaultQuery("code", "")
+	t = ctx.Query("code")
 	if t != "" {
 		course.Code = new(string)
 		*course.Code = t
 	}
-	t = ctx.DefaultQuery("name", "")
+	t = ctx.Query("name")
 	if t != "" {
 		course.Name = new(string)
 		*course.Name = t
 	}
-	t = ctx.DefaultQuery("foreignName", "")
+	t = ctx.Query("foreignName")
 	if t != "" {
 		course.ForeignName = new(string)
 		*course.ForeignName = t
 	}
-	t = ctx.DefaultQuery("remark", "")
+	t = ctx.Query("remark")
 	if t != "" {
 		course.Remark = new(string)
 		*course.Remark = t
 	}
-	t = ctx.DefaultQuery("showRemark", "")
+	t = ctx.Query("showRemark")
 	if t != "" {
 		course.ShowRemark = new(string)
 		*course.ShowRemark = t
 	}
-	t = ctx.DefaultQuery("departmentName", "")
+	t = ctx.Query("departmentName")
 	if t != "" {
 		course.DepartmentName = new(string)
 		*course.DepartmentName = t
 	}
-	t = ctx.DefaultQuery("leaderName", "")
+	t = ctx.Query("leaderName")
 	if t != "" {
 		course.LeaderName = new(string)
 		*course.LeaderName = t
 	}
-	t = ctx.DefaultQuery("assessment", "")
+	t = ctx.Query("assessment")
 	if t != "" {
 		course.Assessment = new(string)
 		*course.Assessment = t
 	}
-	credit, err := strconv.ParseFloat(ctx.DefaultQuery("credit", ""), 64)
+	credit, err := strconv.ParseFloat(ctx.Query("credit"), 64)
 	if err == nil {
 		course.Credit = new(float64)
 		*course.Credit = credit
