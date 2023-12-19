@@ -2,6 +2,7 @@ package service
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -36,14 +37,22 @@ func (c *CourseService) DeleteCourse(id uint) error {
 	return nil
 }
 
-func (c *CourseService) GetCourse(id uint, course *model.Course) error {
+func (c *CourseService) GetCourseByCode(code string) (json.RawMessage, error) {
+	var course model.Course
 	db := database.DB
 
-	if err := db.Where("id = ?", id).First(course).Error; err != nil {
-		return err
+	if err := db.Where("code = ?", code).First(&course).Error; err != nil {
+		return nil, err
 	}
 
-	if course.HoursTotal == nil {
+	var t sql.NullString
+	if err := db.Model(&model.Course{}).Where("id = ?", course.ID).Select("hours_total").Scan(&t).Error; err != nil {
+		return nil, err
+	}
+	course.HoursTotal = new(interface{})
+	if t.Valid {
+		*course.HoursTotal = t.String
+	} else {
 		var sum int
 		if course.HoursLecture != nil {
 			sum += *course.HoursLecture
@@ -63,7 +72,12 @@ func (c *CourseService) GetCourse(id uint, course *model.Course) error {
 		*course.HoursTotal = sum
 	}
 
-	return nil
+	result, err := json.Marshal(course)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (c *CourseService) UpdateCourse(id uint, course *model.Course) error {
