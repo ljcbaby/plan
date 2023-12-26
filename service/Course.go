@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/ljcbaby/plan/database"
 	"github.com/ljcbaby/plan/model"
@@ -268,7 +267,7 @@ func (c *CourseService) GetCourseList(page *model.Page, r *model.Course, courses
 		db = db.Where("assessment = ?", *r.Assessment)
 	}
 	if r.Credit != nil {
-		db = db.Where("credit LIKE ?", fmt.Sprintf("%f", *r.Credit)+"%")
+		db = db.Where("credit = ?", *r.Credit)
 	}
 
 	if err := db.Model(&model.Course{}).Count(&page.Total).Error; err != nil {
