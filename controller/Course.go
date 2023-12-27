@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -231,10 +232,29 @@ func (c *CourseController) GetCourseList(ctx *gin.Context) {
 }
 
 func (c *CourseController) UploadCourseFile(ctx *gin.Context) {
-	ctx.JSON(http.StatusServiceUnavailable, model.Response{
-		Code: -1,
-		Msg:  "Under construction.",
-	})
+	file, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	var sum uint = 0
+	var errs []string
+
+	cs := &service.CourseService{}
+	err = cs.ImportFile(file, &sum, &errs)
+	if err != nil {
+		returnMySQLError(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, Success(gin.H{
+		"success": sum,
+		"err":     errs,
+	}))
 }
 
 func (c *CourseController) GetCourseFileList(ctx *gin.Context) {

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/ljcbaby/plan/config"
@@ -441,4 +442,177 @@ func (c *CourseService) ExportFile() (string, error) {
 	}
 
 	return filename, nil
+}
+
+func (c *CourseService) ImportFile(file []byte, sun *uint, errs *[]string) error {
+	xlFile, err := xlsx.OpenBinary(file)
+	if err != nil {
+		return err
+	}
+
+	if len(xlFile.Sheets) == 0 {
+		return errors.New("sheet is empty")
+	}
+
+	db := database.DB
+
+	sheet := xlFile.Sheets[0]
+	tx := db.Begin()
+	for i, row := range sheet.Rows {
+		if i == 0 {
+			continue
+		}
+
+		var course model.Course
+		for j, cell := range row.Cells {
+			switch j {
+			case 0:
+				course.Code = new(string)
+				*course.Code = cell.String()
+				if *course.Code == "" {
+					course.Code = nil
+				}
+			case 1:
+				course.Name = new(string)
+				*course.Name = cell.String()
+				if *course.Name == "" {
+					course.Name = nil
+				}
+			case 2:
+				course.ForeignName = new(string)
+				*course.ForeignName = cell.String()
+				if *course.ForeignName == "" {
+					course.ForeignName = nil
+				}
+			case 3:
+				course.Credit = new(float64)
+				*course.Credit, err = cell.Float()
+				if err != nil {
+					course.Credit = nil
+				}
+			case 4:
+				course.HoursTotal = new(interface{})
+				*course.HoursTotal, err = cell.Int()
+				if err != nil {
+					*course.HoursTotal = cell.String()
+					if *course.HoursTotal == "" {
+						*course.HoursTotal = nil
+					}
+				}
+			case 5:
+				course.HoursLecture = new(int)
+				*course.HoursLecture, err = cell.Int()
+				if err != nil {
+					course.HoursLecture = nil
+				}
+			case 6:
+				course.HoursPractices = new(int)
+				*course.HoursPractices, err = cell.Int()
+				if err != nil {
+					course.HoursPractices = nil
+				}
+			case 7:
+				course.HoursExperiment = new(int)
+				*course.HoursExperiment, err = cell.Int()
+				if err != nil {
+					course.HoursExperiment = nil
+				}
+			case 8:
+				course.HoursComputer = new(int)
+				*course.HoursComputer, err = cell.Int()
+				if err != nil {
+					course.HoursComputer = nil
+				}
+			case 9:
+				course.HoursSelf = new(int)
+				*course.HoursSelf, err = cell.Int()
+				if err != nil {
+					course.HoursSelf = nil
+				}
+			case 10:
+				course.Assessment = new(string)
+				*course.Assessment = cell.String()
+				if *course.Assessment == "" {
+					course.Assessment = nil
+				}
+			case 11:
+				course.ShowRemark = new(string)
+				*course.ShowRemark = cell.String()
+				if *course.ShowRemark == "" {
+					course.ShowRemark = nil
+				}
+			case 12:
+				course.Remark = new(string)
+				*course.Remark = cell.String()
+				if *course.Remark == "" {
+					course.Remark = nil
+				}
+			case 13:
+				course.DepartmentName = new(string)
+				*course.DepartmentName = cell.String()
+				if *course.DepartmentName == "" {
+					course.DepartmentName = nil
+				}
+			case 14:
+				course.LeaderName = new(string)
+				*course.LeaderName = cell.String()
+				if *course.LeaderName == "" {
+					course.LeaderName = nil
+				}
+			}
+		}
+
+		if course.Code == nil || course.Name == nil || course.ForeignName == nil || course.Credit == nil ||
+			*course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil ||
+			course.LeaderName == nil {
+			*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 必填字段不能为空")
+			continue
+		}
+
+		t, ok := (*course.HoursTotal).(int)
+		if ok {
+			var sum int
+			if course.HoursLecture != nil {
+				sum += *course.HoursLecture
+			}
+			if course.HoursPractices != nil {
+				sum += *course.HoursPractices
+			}
+			if course.HoursExperiment != nil {
+				sum += *course.HoursExperiment
+			}
+			if course.HoursComputer != nil {
+				sum += *course.HoursComputer
+			}
+			if course.HoursSelf != nil {
+				sum += *course.HoursSelf
+			}
+			if t != sum {
+				*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 总学时不等于其他学时之和")
+				continue
+			}
+		} else {
+			if !(course.HoursLecture == nil && course.HoursPractices == nil && course.HoursExperiment == nil &&
+				course.HoursComputer == nil && course.HoursSelf == nil) {
+				*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 学时设置不正确")
+				continue
+			}
+		}
+
+		if err := tx.Create(&course).Error; err != nil {
+			if strings.Contains(err.Error(), "Duplicate entry") {
+				*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 课程号已存在")
+				continue
+			} else {
+				tx.Rollback()
+				return err
+			}
+		} else {
+			*sun++
+		}
+	}
+
+	tx.Commit()
+
+	return nil
 }
