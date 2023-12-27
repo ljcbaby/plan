@@ -599,6 +599,13 @@ func (c *CourseService) ImportFile(file []byte, sun *uint, errs *[]string) error
 			}
 		}
 
+		switch *course.Assessment {
+		case "X", "Y", "C":
+		default:
+			*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 考核方式不正确")
+			continue
+		}
+
 		if err := tx.Create(&course).Error; err != nil {
 			if strings.Contains(err.Error(), "Duplicate entry") {
 				*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 课程号已存在")
