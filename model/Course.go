@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"strconv"
 )
 
 // 课程
@@ -44,7 +45,12 @@ func (c *Course) UnmarshalJSON(data []byte) error {
 			if err := json.Unmarshal(aux.HoursTotal, &hoursTotal); err != nil {
 				return err
 			}
-			*c.HoursTotal = hoursTotal
+			i, err := strconv.Atoi(hoursTotal)
+			if err != nil {
+				*c.HoursTotal = hoursTotal
+			} else {
+				*c.HoursTotal = i
+			}
 		} else {
 			var hoursTotal int
 			if err := json.Unmarshal(aux.HoursTotal, &hoursTotal); err != nil {
