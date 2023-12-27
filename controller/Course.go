@@ -238,8 +238,23 @@ func (c *CourseController) UploadCourseFile(ctx *gin.Context) {
 }
 
 func (c *CourseController) GetCourseFileList(ctx *gin.Context) {
-	ctx.JSON(http.StatusServiceUnavailable, model.Response{
-		Code: -1,
-		Msg:  "Under construction.",
-	})
+	flag := ctx.Query("content")
+
+	cs := &service.CourseService{}
+	var url string
+	if flag == "all" {
+		file, err := cs.ExportFile()
+		if err != nil {
+			returnMySQLError(ctx, err)
+			return
+		}
+		url = "/v1/download/" + file
+	} else {
+		if err := cs.ReleaseTemplate(); err != nil {
+			returnMySQLError(ctx, err)
+			return
+		}
+		url = "/v1/download/course-template.xlsx"
+	}
+	ctx.JSON(http.StatusOK, Success(url))
 }

@@ -4,9 +4,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"os"
+	"path"
+	"time"
 
+	"github.com/ljcbaby/plan/config"
 	"github.com/ljcbaby/plan/database"
 	"github.com/ljcbaby/plan/model"
+	"github.com/tealeg/xlsx"
 )
 
 type CourseService struct{}
@@ -309,4 +315,130 @@ func (c *CourseService) GetCourseList(page *model.Page, r *model.Course, courses
 	}
 
 	return nil
+}
+
+func (c *CourseService) ReleaseTemplate() error {
+	filename := "course-template.xlsx"
+	filepath := path.Join(config.Conf.Download.SavePath, filename)
+
+	if _, err := os.Stat(filepath); err != nil {
+		db := database.DB
+
+		var template struct {
+			Data []byte `gorm:"type:longblob"`
+		}
+		if err := db.Table("templates").Select("data").Where("name = ?", "courses").
+			Scan(&template).Error; err != nil {
+			return err
+		}
+
+		if len(template.Data) == 0 {
+			return errors.New("template data is empty")
+		}
+
+		if _, err := os.Stat(config.Conf.Download.SavePath); err != nil {
+			if err := os.MkdirAll(config.Conf.Download.SavePath, 0775); err != nil {
+				return err
+			}
+		}
+
+		if err := os.WriteFile(filepath, template.Data, 0775); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *CourseService) ExportFile() (string, error) {
+	filename := "course-" + time.Now().Format("20060102150405") + ".xlsx"
+	filepath := path.Join(config.Conf.Download.SavePath, filename)
+
+	if _, err := os.Stat(config.Conf.Download.SavePath); err != nil {
+		if err := os.MkdirAll(config.Conf.Download.SavePath, 0775); err != nil {
+			return "", err
+		}
+	}
+
+	file := xlsx.NewFile()
+	sheet, err := file.AddSheet("Sheet")
+	if err != nil {
+		return "", err
+	}
+
+	header := sheet.AddRow()
+	header.AddCell().Value = "课程号"
+	header.AddCell().Value = "课程名"
+	header.AddCell().Value = "课程外文名"
+	header.AddCell().Value = "学分"
+	header.AddCell().Value = "总学时"
+	header.AddCell().Value = "讲授"
+	header.AddCell().Value = "课程实践"
+	header.AddCell().Value = "实验"
+	header.AddCell().Value = "课内上机"
+	header.AddCell().Value = "课外上机"
+	header.AddCell().Value = "考核方式"
+	header.AddCell().Value = "展示备注"
+	header.AddCell().Value = "开课备注"
+	header.AddCell().Value = "开课学院"
+	header.AddCell().Value = "课程负责人"
+
+	var courses []model.Course
+	err = c.GetCourseList(&model.Page{Current: 1, PageSize: 100000}, &model.Course{}, &courses)
+	if err != nil {
+		return "", err
+	}
+
+	for _, course := range courses {
+		row := sheet.AddRow()
+		row.AddCell().Value = *course.Code
+		row.AddCell().Value = *course.Name
+		row.AddCell().Value = *course.ForeignName
+		row.AddCell().Value = fmt.Sprintf("%v", *course.Credit)
+		row.AddCell().Value = fmt.Sprintf("%v", *course.HoursTotal)
+		if course.HoursLecture != nil {
+			row.AddCell().Value = fmt.Sprintf("%v", *course.HoursLecture)
+		} else {
+			row.AddCell().Value = ""
+		}
+		if course.HoursPractices != nil {
+			row.AddCell().Value = fmt.Sprintf("%v", *course.HoursPractices)
+		} else {
+			row.AddCell().Value = ""
+		}
+		if course.HoursExperiment != nil {
+			row.AddCell().Value = fmt.Sprintf("%v", *course.HoursExperiment)
+		} else {
+			row.AddCell().Value = ""
+		}
+		if course.HoursComputer != nil {
+			row.AddCell().Value = fmt.Sprintf("%v", *course.HoursComputer)
+		} else {
+			row.AddCell().Value = ""
+		}
+		if course.HoursSelf != nil {
+			row.AddCell().Value = fmt.Sprintf("%v", *course.HoursSelf)
+		} else {
+			row.AddCell().Value = ""
+		}
+		row.AddCell().Value = *course.Assessment
+		if course.ShowRemark != nil {
+			row.AddCell().Value = fmt.Sprintf("%v", *course.ShowRemark)
+		} else {
+			row.AddCell().Value = ""
+		}
+		if course.Remark != nil {
+			row.AddCell().Value = fmt.Sprintf("%v", *course.Remark)
+		} else {
+			row.AddCell().Value = ""
+		}
+		row.AddCell().Value = *course.DepartmentName
+		row.AddCell().Value = *course.LeaderName
+	}
+
+	if err := file.Save(filepath); err != nil {
+		return "", err
+	}
+
+	return filename, nil
 }
