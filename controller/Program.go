@@ -91,7 +91,7 @@ func (c *ProgramController) GetProgram(ctx *gin.Context) {
 		return
 	}
 
-	isContentNeeded, err := strconv.Atoi(ctx.DefaultQuery("content", "0"))
+	isContentNeeded, err := strconv.Atoi(ctx.DefaultQuery("content", "1"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, model.Response{
 			Code: 1001,
@@ -102,10 +102,10 @@ func (c *ProgramController) GetProgram(ctx *gin.Context) {
 
 	var program model.Program
 	ps := &service.ProgramService{}
-	if isContentNeeded == 1 {
-		err = ps.GetProgramWithContent(uint(id), &program)
-	} else {
+	if isContentNeeded == 0 {
 		err = ps.GetProgramWithNoContent(uint(id), &program)
+	} else {
+		err = ps.GetProgramWithContent(uint(id), &program)
 	}
 	if err != nil {
 		if err.Error() == "record not found" {

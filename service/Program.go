@@ -10,8 +10,19 @@ import (
 type ProgramService struct{}
 
 func (s *ProgramService) CreateProgram(program *model.Program) (uint, error) {
-	content := json.RawMessage("{}")
-	program.Content = &content
+	var Content model.Node
+	Content.ID = new(string)
+	*Content.ID = "root"
+	Content.Title = new(model.Title)
+	Content.Title.Type = new(string)
+	*Content.Title.Type = "node"
+	Content.Title.Name = new(string)
+	*Content.Title.Name = *program.Name
+	Content.Content = new([]model.Node)
+	*Content.Content = []model.Node{}
+
+	program.Content = new(json.RawMessage)
+	*program.Content, _ = json.Marshal(Content)
 
 	db := database.DB
 
