@@ -251,7 +251,7 @@ func (c *CourseController) UploadCourseFile(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, Success(gin.H{
+	ctx.JSON(http.StatusOK, Success(gin.H{
 		"success": sum,
 		"err":     errs,
 	}))

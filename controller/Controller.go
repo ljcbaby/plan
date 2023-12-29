@@ -41,7 +41,7 @@ func (c *Controller) DownloadFile(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Header("Content-Disposition", "attachment; filename="+filename)
+	ctx.Header("Content-Disposition", "attachment; filename=\""+filename+"\"")
 	ctx.Header("Content-Type", "application/octet-stream")
 	ctx.Header("Content-Length", strconv.FormatInt(fileInfo.Size(), 10))
 
