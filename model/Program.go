@@ -18,24 +18,36 @@ type Program struct {
 
 // 节点
 type Node struct {
-	ID          *uint            `json:"id,omitempty"`          // 节点ID
-	Name        *string          `json:"name,omitempty"`        // 节点名称
-	BeginWeek   *string          `json:"beginWeek,omitempty"`   // 起始周
-	CourseCode  *string          `json:"courseCode,omitempty"`  // 课程号
-	Remark      *string          `json:"remark,omitempty"`      // 备注
-	Semester    *string          `json:"semester,omitempty"`    // 学期
-	Tags        *[]string        `json:"tags,omitempty"`        // 标签
-	Type        *string          `json:"type,omitempty"`        // 类型，node or course
-	Requirement *Requirement     `json:"requirement,omitempty"` // 要求
-	Content     *[]Node          `json:"content,omitempty"`     // 包含节点/课程
-	ParentID    *uint            `json:"parentId,omitempty"`    // 父节点ID
-	Course      *json.RawMessage `json:"course,omitempty"`      // 课程详情
+	ID      *string `json:"id,omitempty"` // 节点ID
+	Title   *Title  `json:"title,omitempty"`
+	Content *[]Node `json:"content,omitempty"`
+}
+
+// 节点信息
+type Title struct {
+	Tags *[]string `json:"tags,omitempty"` // 标签
+	Type *string   `json:"type,omitempty"` // 类型
+	TitleNode
+	TitleCourse
+}
+
+// 节点信息-节点
+type TitleNode struct {
+	Name        *string      `json:"name,omitempty"`        // 节点名
+	Requirement *Requirement `json:"requirement,omitempty"` // 节点要求
+	Remark      *string      `json:"remark,omitempty"`      // 备注
+}
+
+// 节点信息-课程
+type TitleCourse struct {
+	CourseCode *string          `json:"courseCode,omitempty"` // 课程号
+	Semester   *string          `json:"semester,omitempty"`   // 学期
+	BeginWeek  *string          `json:"beginWeek,omitempty"`  // 起始周
+	Course     *json.RawMessage `json:"course,omitempty"`     // 课程
 }
 
 // 要求
 type Requirement struct {
-	ID        uint  `json:"id,omitempty"`        // 要求ID
-	MinCourse int64 `json:"minCourse,omitempty"` // 最少修习门数
-	MinCredit int64 `json:"minCredit,omitempty"` // 最低学分
-	NodeID    uint  `json:"nodeId,omitempty"`    // 对应节点ID
+	MinCredit *float64 `json:"minCredit,omitempty"` // 最低学分
+	MinCourse *int     `json:"minCourse,omitempty"` // 最少修习门数
 }

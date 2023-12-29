@@ -76,19 +76,23 @@ func (s *ProgramService) GetProgramWithContent(id uint, program *model.Program) 
 		node := queue[0]
 		queue = queue[1:]
 
-		if *node.Type == "course" && node.CourseCode != nil {
+		if *node.Title.Type == "course" && node.Title.CourseCode != nil {
 			cs := &CourseService{}
 
-			node.Course = new(json.RawMessage)
-			*node.Course, err = cs.GetCourseByCode(*node.CourseCode)
+			node.Title.Course = new(json.RawMessage)
+			*node.Title.Course, err = cs.GetCourseByCode(*node.Title.CourseCode)
 			if err != nil {
-				return err
+				if err.Error() == "record not found" {
+					*node.Title.Course = json.RawMessage("{\"name\":\"课程已删除\",\"foreignName\":\"\",\"credit\":0,\"assessment\":\"\",\"departmentName\":\"\",\"leaderName\":\"\"}")
+				} else {
+					return err
+				}
 			}
 
 			continue
 		}
 
-		if *node.Type == "node" && node.Content != nil {
+		if *node.Title.Type == "node" && node.Content != nil {
 			for i := range *node.Content {
 				queue = append(queue, &(*node.Content)[i])
 			}
@@ -120,8 +124,8 @@ func (s *ProgramService) GenerateProgramTags(program *model.Program) error {
 		node := queue[0]
 		queue = queue[1:]
 
-		if node.Tags != nil {
-			*program.Tags = append(*program.Tags, *node.Tags...)
+		if node.Title != nil && node.Title.Tags != nil {
+			*program.Tags = append(*program.Tags, *node.Title.Tags...)
 		}
 
 		if node.Content != nil {
@@ -129,6 +133,16 @@ func (s *ProgramService) GenerateProgramTags(program *model.Program) error {
 				queue = append(queue, &(*node.Content)[i])
 			}
 		}
+	}
+
+	m := make(map[string]bool)
+	for _, v := range *program.Tags {
+		m[v] = true
+	}
+
+	program.Tags = &[]string{}
+	for k := range m {
+		*program.Tags = append(*program.Tags, k)
 	}
 
 	return nil
