@@ -112,20 +112,25 @@ func (s *ProgramService) GetProgramWithContent(id uint, program *model.Program) 
 func (s *ProgramService) GenerateProgramTags(program *model.Program) error {
 	program.Tags = &[]string{}
 
-	queue := []*model.Node{}
-
 	var content model.Node
 	if err := json.Unmarshal(*program.Content, &content); err != nil {
 		return err
 	}
-	queue = append(queue, &content)
+
+	queue := []*model.Node{&content}
+	seenTags := make(map[string]bool)
 
 	for len(queue) > 0 {
 		node := queue[0]
 		queue = queue[1:]
 
 		if node.Title != nil && node.Title.Tags != nil {
-			*program.Tags = append(*program.Tags, *node.Title.Tags...)
+			for _, tag := range *node.Title.Tags {
+				if !seenTags[tag] {
+					*program.Tags = append(*program.Tags, tag)
+					seenTags[tag] = true
+				}
+			}
 		}
 
 		if node.Content != nil {
@@ -133,16 +138,6 @@ func (s *ProgramService) GenerateProgramTags(program *model.Program) error {
 				queue = append(queue, &(*node.Content)[i])
 			}
 		}
-	}
-
-	m := make(map[string]bool)
-	for _, v := range *program.Tags {
-		m[v] = true
-	}
-
-	program.Tags = &[]string{}
-	for k := range m {
-		*program.Tags = append(*program.Tags, k)
 	}
 
 	return nil
