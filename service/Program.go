@@ -172,3 +172,86 @@ func (s *ProgramService) GetProgramList(programs *[]model.Program) error {
 
 	return nil
 }
+
+func (s *ProgramService) UpdateProgram(id uint, program *model.Program) error {
+	db := database.DB
+
+	var oldProgram model.Program
+	if err := db.Where("id = ?", id).First(&oldProgram).Error; err != nil {
+		return err
+	}
+
+	tx := db.Begin()
+
+	if program.Name != nil {
+		if err := tx.Model(&oldProgram).Update("name", program.Name).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if program.Major != nil {
+		if err := tx.Model(&oldProgram).Update("major", program.Major).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if program.Department != nil {
+		if err := tx.Model(&oldProgram).Update("department", program.Department).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if program.DependencyID != nil {
+		if err := tx.Model(&oldProgram).Update("dependency_id", program.DependencyID).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if program.Grade != nil {
+		if err := tx.Model(&oldProgram).Update("grade", program.Grade).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if program.Content != nil {
+		queue := []*model.Node{}
+
+		var content model.Node
+		if err := json.Unmarshal(*program.Content, &content); err != nil {
+			tx.Rollback()
+			return err
+		}
+		queue = append(queue, &content)
+
+		for len(queue) > 0 {
+			node := queue[0]
+			queue = queue[1:]
+
+			if node.Title != nil && node.Title.Course != nil {
+				node.Title.Course = nil
+			}
+
+			if node.Content != nil {
+				for i := range *node.Content {
+					queue = append(queue, &(*node.Content)[i])
+				}
+			}
+		}
+
+		*program.Content, _ = json.Marshal(content)
+
+		if err := tx.Model(&oldProgram).Update("content", program.Content).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	tx.Commit()
+
+	return nil
+}

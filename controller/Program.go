@@ -75,10 +75,37 @@ func (c *ProgramController) DeleteProgram(ctx *gin.Context) {
 }
 
 func (c *ProgramController) UpdateProgram(ctx *gin.Context) {
-	ctx.JSON(http.StatusServiceUnavailable, model.Response{
-		Code: -1,
-		Msg:  "Under construction.",
-	})
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  "Invalid ID.",
+		})
+		return
+	}
+
+	var program model.Program
+	if err := ctx.ShouldBindJSON(&program); err != nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	ps := &service.ProgramService{}
+	err = ps.UpdateProgram(uint(id), &program)
+	if err != nil {
+		if err.Error() == "record not found" {
+			ctx.JSON(http.StatusBadRequest, model.Response{
+				Code: 1001,
+				Msg:  "Program not found.",
+			})
+			return
+		}
+		returnMySQLError(ctx, err)
+		return
+	}
 }
 
 func (c *ProgramController) GetProgram(ctx *gin.Context) {
