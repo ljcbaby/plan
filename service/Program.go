@@ -2,7 +2,10 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
+	"sort"
 
+	"github.com/gin-gonic/gin"
 	"github.com/ljcbaby/plan/database"
 	"github.com/ljcbaby/plan/model"
 )
@@ -94,7 +97,15 @@ func (s *ProgramService) GetProgramWithContent(id uint, program *model.Program) 
 			*node.Title.Course, err = cs.GetCourseByCode(*node.Title.CourseCode)
 			if err != nil {
 				if err.Error() == "record not found" {
-					*node.Title.Course = json.RawMessage("{\"name\":\"课程已删除\",\"foreignName\":\"\",\"credit\":0,\"assessment\":\"\",\"departmentName\":\"\",\"leaderName\":\"\"}")
+					courseJSON, _ := json.Marshal(gin.H{
+						"name":           "课程已删除",
+						"foreignName":    "",
+						"credit":         0,
+						"assessment":     "",
+						"departmentName": "",
+						"leaderName":     "",
+					})
+					*node.Title.Course = json.RawMessage(courseJSON)
 				} else {
 					return err
 				}
@@ -111,6 +122,64 @@ func (s *ProgramService) GetProgramWithContent(id uint, program *model.Program) 
 			continue
 		}
 	}
+
+	var dfs func(node *model.Node) float64
+	dfs = func(node *model.Node) float64 {
+		fmt.Println(*node.ID)
+
+		if node.Title != nil && node.Title.Type != nil && *node.Title.Type == "course" {
+			var credit float64 = 0
+
+			if node.Title.Course != nil {
+				var course model.Course
+				if err := json.Unmarshal(*node.Title.Course, &course); err != nil {
+					return 0
+				}
+
+				if course.Credit != nil {
+					credit = *course.Credit
+				}
+			}
+
+			return credit
+		}
+
+		if node.Title != nil && node.Title.Type != nil && *node.Title.Type == "node" {
+			if node.Title.Requirement != nil && node.Title.Requirement.MinCredit != nil {
+				return *node.Title.Requirement.MinCredit
+			}
+
+			var allCredit float64 = 0
+
+			if node.Content != nil {
+				if node.Title.Requirement != nil && node.Title.Requirement.MinCourse != nil {
+					var l []float64
+					for i := range *node.Content {
+						l = append(l, dfs(&(*node.Content)[i]))
+					}
+					if len(l) < *node.Title.Requirement.MinCourse {
+						allCredit = -1
+					} else {
+						sort.Float64s(l)
+						for i := 0; i < *node.Title.Requirement.MinCourse; i++ {
+							allCredit += l[i]
+						}
+					}
+				} else {
+					for i := range *node.Content {
+						allCredit += dfs(&(*node.Content)[i])
+					}
+				}
+			}
+
+			node.Title.AllCredit = new(float64)
+			*node.Title.AllCredit = allCredit
+		}
+
+		return *node.Title.AllCredit
+	}
+
+	dfs(&content)
 
 	*program.Content, err = json.Marshal(content)
 	if err != nil {

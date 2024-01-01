@@ -36,6 +36,7 @@ type TitleNode struct {
 	Name        *string      `json:"name,omitempty"`        // 节点名
 	Requirement *Requirement `json:"requirement,omitempty"` // 节点要求
 	Remark      *string      `json:"remark,omitempty"`      // 备注
+	AllCredit   *float64     `json:"allCredit,omitempty"`   // 总学分
 }
 
 // 节点信息-课程
