@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 
 	"github.com/gin-gonic/gin"
@@ -125,8 +124,6 @@ func (s *ProgramService) GetProgramWithContent(id uint, program *model.Program) 
 
 	var dfs func(node *model.Node) float64
 	dfs = func(node *model.Node) float64 {
-		fmt.Println(*node.ID)
-
 		if node.Title != nil && node.Title.Type != nil && *node.Title.Type == "course" {
 			var credit float64 = 0
 
@@ -238,6 +235,83 @@ func (s *ProgramService) GetProgramList(programs *[]model.Program) error {
 
 		(*programs)[i].Content = nil
 	}
+
+	return nil
+}
+
+func (s *ProgramService) CalculateProgram(id uint, tags *[]string, credit *float64, hours *int) error {
+	var program model.Program
+	if err := s.GetProgramWithContent(id, &program); err != nil {
+		return err
+	}
+
+	*credit = 0
+	*hours = 0
+	tag := (*tags)[0]
+
+	var dfs func(node *model.Node)
+	dfs = func(node *model.Node) {
+		if node.Title != nil && node.Title.Type != nil && *node.Title.Type == "course" {
+			var flag bool = false
+
+			if node.Title.Tags != nil {
+				for _, t := range *node.Title.Tags {
+					if t == tag {
+						flag = true
+						break
+					}
+				}
+			}
+
+			if flag && node.Title.Course != nil {
+				var course model.Course
+				if err := json.Unmarshal(*node.Title.Course, &course); err != nil {
+					return
+				}
+
+				if course.Credit != nil {
+					*credit += *course.Credit
+				}
+			}
+
+			return
+		}
+
+		if node.Title != nil && node.Title.Type != nil && *node.Title.Type == "node" {
+			var flag bool = false
+
+			if node.Title.Tags != nil {
+				for _, t := range *node.Title.Tags {
+					if t == tag {
+						flag = true
+						break
+					}
+				}
+			}
+
+			if flag {
+				if node.Title.AllCredit != nil {
+					*credit += *node.Title.AllCredit
+				} else {
+					*credit += *node.Title.Requirement.MinCredit
+				}
+				return
+			}
+
+			if node.Content != nil {
+				for i := range *node.Content {
+					dfs(&(*node.Content)[i])
+				}
+			}
+		}
+	}
+
+	var content model.Node
+	if err := json.Unmarshal(*program.Content, &content); err != nil {
+		return err
+	}
+
+	dfs(&content)
 
 	return nil
 }

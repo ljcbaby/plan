@@ -152,10 +152,38 @@ func (c *ProgramController) GetProgram(ctx *gin.Context) {
 }
 
 func (c *ProgramController) CalculateProgram(ctx *gin.Context) {
-	ctx.JSON(http.StatusServiceUnavailable, model.Response{
-		Code: -1,
-		Msg:  "Under construction.",
-	})
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  "Invalid ID.",
+		})
+		return
+	}
+
+	var tags []string
+	if err := ctx.ShouldBindJSON(&tags); err != nil {
+		ctx.JSON(http.StatusBadRequest, model.Response{
+			Code: 1001,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	var credit float64
+	var hours int
+
+	ps := &service.ProgramService{}
+	err = ps.CalculateProgram(uint(id), &tags, &credit, &hours)
+	if err != nil {
+		returnMySQLError(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, Success(gin.H{
+		"credit": credit,
+		"hours":  hours,
+	}))
 }
 
 func (c *ProgramController) GetProgramList(ctx *gin.Context) {

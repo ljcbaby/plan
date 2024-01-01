@@ -38,7 +38,7 @@ func SetupRouter() *gin.Engine {
 		v1.DELETE("/programs/:id", Controller.Program.DeleteProgram)
 		v1.PATCH("/programs/:id", Controller.Program.UpdateProgram)
 		v1.GET("/programs/:id", Controller.Program.GetProgram)
-		v1.GET("/programs/:id/calculate", Controller.Program.CalculateProgram)
+		v1.POST("/programs/:id/calculate", Controller.Program.CalculateProgram)
 		v1.GET("/programs", Controller.Program.GetProgramList)
 		v1.GET("/programs/:id/files", Controller.Program.GetProgramFile)
 
