@@ -49,5 +49,5 @@ type TitleCourse struct {
 // 要求
 type Requirement struct {
 	MinCredit *float64 `json:"minCredit,omitempty"` // 最低学分
-	MinCourse *int     `json:"minCourse,omitempty"` // 最少修习门数
+	MinCourse *int     `json:"minCourse,omitempty"` // 最低满足节点数
 }

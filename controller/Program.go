@@ -106,6 +106,8 @@ func (c *ProgramController) UpdateProgram(ctx *gin.Context) {
 		returnMySQLError(ctx, err)
 		return
 	}
+
+	c.GetProgram(ctx)
 }
 
 func (c *ProgramController) GetProgram(ctx *gin.Context) {
