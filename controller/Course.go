@@ -48,9 +48,6 @@ func (c *CourseController) CreateCourse(ctx *gin.Context) {
 		if course.HoursComputer != nil {
 			sum += *course.HoursComputer
 		}
-		if course.HoursSelf != nil {
-			sum += *course.HoursSelf
-		}
 		if t != sum {
 			ctx.JSON(http.StatusBadRequest, model.Response{
 				Code: 1001,
@@ -59,8 +56,8 @@ func (c *CourseController) CreateCourse(ctx *gin.Context) {
 			return
 		}
 	} else {
-		if !(course.HoursLecture == nil && course.HoursPractices == nil && course.HoursExperiment == nil &&
-			course.HoursComputer == nil && course.HoursSelf == nil) {
+		if !(course.HoursLecture == nil && course.HoursPractices == nil &&
+			course.HoursExperiment == nil && course.HoursComputer == nil) {
 			ctx.JSON(http.StatusBadRequest, model.Response{
 				Code: 1001,
 				Msg:  "Hours not set properly.",
@@ -166,6 +163,24 @@ func (c *CourseController) GetCourseList(ctx *gin.Context) {
 			Code: 1001,
 			Msg:  "Page meta error.",
 		})
+		return
+	}
+
+	q := ctx.Query("q")
+	if q != "" {
+		cs := &service.CourseService{}
+		var courses []model.Course
+
+		err := cs.GetCourseListQuery(&page, &q, &courses)
+		if err != nil {
+			returnMySQLError(ctx, err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, Success(gin.H{
+			"page": page,
+			"list": courses,
+		}))
 		return
 	}
 

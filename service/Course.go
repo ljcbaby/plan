@@ -72,9 +72,6 @@ func (c *CourseService) GetCourseByCode(code string) (json.RawMessage, error) {
 		if course.HoursComputer != nil {
 			sum += *course.HoursComputer
 		}
-		if course.HoursSelf != nil {
-			sum += *course.HoursSelf
-		}
 		*course.HoursTotal = sum
 	}
 
@@ -140,9 +137,6 @@ func (c *CourseService) UpdateCourse(id uint, course *model.Course) error {
 			if course.HoursComputer != nil {
 				sum += *course.HoursComputer
 			}
-			if course.HoursSelf != nil {
-				sum += *course.HoursSelf
-			}
 			if t != sum {
 				tx.Rollback()
 				return errors.New("errHoursTotal")
@@ -173,8 +167,8 @@ func (c *CourseService) UpdateCourse(id uint, course *model.Course) error {
 				return err
 			}
 		} else {
-			if !(course.HoursLecture == nil && course.HoursPractices == nil && course.HoursExperiment == nil &&
-				course.HoursComputer == nil && course.HoursSelf == nil) {
+			if !(course.HoursLecture == nil && course.HoursPractices == nil &&
+				course.HoursExperiment == nil && course.HoursComputer == nil) {
 				tx.Rollback()
 				return errors.New("errHoursTotal")
 			}
@@ -308,8 +302,50 @@ func (c *CourseService) GetCourseList(page *model.Page, r *model.Course, courses
 			if (*courses)[i].HoursComputer != nil {
 				sum += *(*courses)[i].HoursComputer
 			}
-			if (*courses)[i].HoursSelf != nil {
-				sum += *(*courses)[i].HoursSelf
+			*(*courses)[i].HoursTotal = sum
+		}
+	}
+
+	return nil
+}
+
+func (c *CourseService) GetCourseListQuery(page *model.Page, q *string, courses *[]model.Course) error {
+	db := database.DB
+
+	db = db.Where("code LIKE ?", "%"+*q+"%").Or("name LIKE ?", "%"+*q+"%").
+		Or("foreign_name LIKE ?", "%"+*q+"%").Or("remark LIKE ?", "%"+*q+"%").
+		Or("show_remark LIKE ?", "%"+*q+"%")
+
+	if err := db.Model(&model.Course{}).Count(&page.Total).Error; err != nil {
+		return err
+	}
+
+	if err := db.Offset((page.Current - 1) * page.PageSize).Limit(page.PageSize).Find(courses).Error; err != nil {
+		return err
+	}
+
+	for i := 0; i < len(*courses); i++ {
+		db := database.DB
+		var t sql.NullString
+		if err := db.Model(&model.Course{}).Where("id = ?", (*courses)[i].ID).Select("hours_total").Scan(&t).Error; err != nil {
+			return err
+		}
+		(*courses)[i].HoursTotal = new(interface{})
+		if t.Valid {
+			*(*courses)[i].HoursTotal = t.String
+		} else {
+			var sum int
+			if (*courses)[i].HoursLecture != nil {
+				sum += *(*courses)[i].HoursLecture
+			}
+			if (*courses)[i].HoursPractices != nil {
+				sum += *(*courses)[i].HoursPractices
+			}
+			if (*courses)[i].HoursExperiment != nil {
+				sum += *(*courses)[i].HoursExperiment
+			}
+			if (*courses)[i].HoursComputer != nil {
+				sum += *(*courses)[i].HoursComputer
 			}
 			*(*courses)[i].HoursTotal = sum
 		}
@@ -584,16 +620,13 @@ func (c *CourseService) ImportFile(file []byte, sun *uint, errs *[]string) error
 			if course.HoursComputer != nil {
 				sum += *course.HoursComputer
 			}
-			if course.HoursSelf != nil {
-				sum += *course.HoursSelf
-			}
 			if t != sum {
 				*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 总学时不等于其他学时之和")
 				continue
 			}
 		} else {
-			if !(course.HoursLecture == nil && course.HoursPractices == nil && course.HoursExperiment == nil &&
-				course.HoursComputer == nil && course.HoursSelf == nil) {
+			if !(course.HoursLecture == nil && course.HoursPractices == nil &&
+				course.HoursExperiment == nil && course.HoursComputer == nil) {
 				*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 学时设置不正确")
 				continue
 			}
