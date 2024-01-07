@@ -143,6 +143,16 @@ func (s *ProgramService) GetProgramWithContent(id uint, program *model.Program) 
 
 		if node.Title != nil && node.Title.Type != nil && *node.Title.Type == "node" {
 			if node.Title.Requirement != nil && node.Title.Requirement.MinCredit != nil {
+				if node.Content != nil {
+					var credit float64 = 0
+					for i := range *node.Content {
+						credit += dfs(&(*node.Content)[i])
+					}
+					if credit < *node.Title.Requirement.MinCredit {
+						return -1
+					}
+				}
+
 				return *node.Title.Requirement.MinCredit
 			}
 
@@ -377,6 +387,10 @@ func (s *ProgramService) UpdateProgram(id uint, program *model.Program) error {
 
 			if node.Title != nil && node.Title.Course != nil {
 				node.Title.Course = nil
+			}
+
+			if node.Title != nil && node.Title.AllCredit != nil {
+				node.Title.AllCredit = nil
 			}
 
 			if node.Content != nil {
