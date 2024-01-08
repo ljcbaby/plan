@@ -502,8 +502,7 @@ func (c *CourseService) ImportFile(file []byte, sun *uint, errs *[]string) error
 		}
 
 		if course.Code == nil || course.Name == nil || course.ForeignName == nil || course.Credit == nil ||
-			course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil ||
-			course.LeaderName == nil {
+			course.DepartmentName == nil || course.LeaderName == nil {
 			*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 必填字段不能为空")
 			continue
 		}
