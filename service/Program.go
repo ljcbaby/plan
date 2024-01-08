@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"sort"
 
 	"github.com/gin-gonic/gin"
@@ -188,6 +189,20 @@ func (s *ProgramService) GetProgramWithContent(id uint, program *model.Program) 
 
 	dfs(&content)
 
+	if program.DependencyID != nil {
+		var dependency model.Program
+		if err := s.GetProgramWithContent(*program.DependencyID, &dependency); err != nil {
+			return err
+		}
+
+		var dependencyContent model.Node
+		if err := json.Unmarshal(*dependency.Content, &dependencyContent); err != nil {
+			return err
+		}
+
+		*content.Title.AllCredit += dfs(&dependencyContent)
+	}
+
 	*program.Content, err = json.Marshal(content)
 	if err != nil {
 		return err
@@ -323,6 +338,18 @@ func (s *ProgramService) CalculateProgram(id uint, tags *[]string, credit *float
 
 	dfs(&content)
 
+	if program.DependencyID != nil {
+		var d_credit float64 = 0
+		var d_hours int = 0
+
+		if err := s.CalculateProgram(*program.DependencyID, tags, &d_credit, &d_hours); err != nil {
+			return err
+		}
+
+		*credit += d_credit
+		*hours += d_hours
+	}
+
 	return nil
 }
 
@@ -358,6 +385,10 @@ func (s *ProgramService) UpdateProgram(id uint, program *model.Program) error {
 	}
 
 	if program.DependencyID != nil {
+		if err := s.GetProgram(*program.DependencyID, &model.Program{}); err != nil {
+			tx.Rollback()
+			return errors.New("errDependencyNotFound")
+		}
 		if err := tx.Model(&oldProgram).Update("dependency_id", program.DependencyID).Error; err != nil {
 			tx.Rollback()
 			return err

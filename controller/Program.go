@@ -103,6 +103,13 @@ func (c *ProgramController) UpdateProgram(ctx *gin.Context) {
 			})
 			return
 		}
+		if err.Error() == "errDependencyNotFound" {
+			ctx.JSON(http.StatusBadRequest, model.Response{
+				Code: 1001,
+				Msg:  "Dependency program does not exist.",
+			})
+			return
+		}
 		returnMySQLError(ctx, err)
 		return
 	}
@@ -182,7 +189,7 @@ func (c *ProgramController) CalculateProgram(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, Success(gin.H{
 		"credit": credit,
-		"hours":  hours,
+		"hour":   hours,
 	}))
 }
 
