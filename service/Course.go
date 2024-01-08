@@ -1,7 +1,6 @@
 package service
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,11 +19,6 @@ type CourseService struct{}
 
 func (c *CourseService) CreateCourse(course *model.Course) (uint, error) {
 	db := database.DB
-
-	_, ok := (*course.HoursTotal).(int)
-	if ok {
-		*course.HoursTotal = nil
-	}
 
 	if err := db.Create(course).Error; err != nil {
 		return 0, err
@@ -49,30 +43,6 @@ func (c *CourseService) GetCourseByCode(code string) (json.RawMessage, error) {
 
 	if err := db.Where("code = ?", code).First(&course).Error; err != nil {
 		return nil, err
-	}
-
-	var t sql.NullString
-	if err := db.Model(&model.Course{}).Where("id = ?", course.ID).Select("hours_total").Scan(&t).Error; err != nil {
-		return nil, err
-	}
-	course.HoursTotal = new(interface{})
-	if t.Valid {
-		*course.HoursTotal = t.String
-	} else {
-		var sum int
-		if course.HoursLecture != nil {
-			sum += *course.HoursLecture
-		}
-		if course.HoursPractices != nil {
-			sum += *course.HoursPractices
-		}
-		if course.HoursExperiment != nil {
-			sum += *course.HoursExperiment
-		}
-		if course.HoursComputer != nil {
-			sum += *course.HoursComputer
-		}
-		*course.HoursTotal = sum
 	}
 
 	result, err := json.Marshal(course)
@@ -121,82 +91,45 @@ func (c *CourseService) UpdateCourse(id uint, course *model.Course) error {
 		}
 	}
 
-	if *course.HoursTotal != nil {
-		t, ok := (*course.HoursTotal).(int)
-		if ok {
-			var sum int
-			if course.HoursLecture != nil {
-				sum += *course.HoursLecture
-			}
-			if course.HoursPractices != nil {
-				sum += *course.HoursPractices
-			}
-			if course.HoursExperiment != nil {
-				sum += *course.HoursExperiment
-			}
-			if course.HoursComputer != nil {
-				sum += *course.HoursComputer
-			}
-			if t != sum {
-				tx.Rollback()
-				return errors.New("errHoursTotal")
-			}
+	if course.HoursTotal != nil {
+		if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_total", course.HoursTotal).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
 
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_total", course.HoursTotal).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_lecture", course.HoursLecture).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_practices", course.HoursPractices).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_experiment", course.HoursExperiment).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_computer", course.HoursComputer).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_self", course.HoursSelf).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-		} else {
-			if !(course.HoursLecture == nil && course.HoursPractices == nil &&
-				course.HoursExperiment == nil && course.HoursComputer == nil) {
-				tx.Rollback()
-				return errors.New("errHoursTotal")
-			}
+	if course.HoursLecture != nil {
+		if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_lecture", course.HoursLecture).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
 
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_total", course.HoursTotal).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_lecture", nil).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_practices", nil).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_experiment", nil).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_computer", nil).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_self", nil).Error; err != nil {
-				tx.Rollback()
-				return err
-			}
+	if course.HoursPractices != nil {
+		if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_practices", course.HoursPractices).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if course.HoursExperiment != nil {
+		if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_experiment", course.HoursExperiment).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if course.HoursComputer != nil {
+		if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_computer", course.HoursComputer).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if course.HoursSelf != nil {
+		if err := tx.Model(&model.Course{}).Where("id = ?", id).Update("hours_self", course.HoursSelf).Error; err != nil {
+			tx.Rollback()
+			return err
 		}
 	}
 
@@ -279,33 +212,6 @@ func (c *CourseService) GetCourseList(page *model.Page, r *model.Course, courses
 		return err
 	}
 
-	for i := 0; i < len(*courses); i++ {
-		db := database.DB
-		var t sql.NullString
-		if err := db.Model(&model.Course{}).Where("id = ?", (*courses)[i].ID).Select("hours_total").Scan(&t).Error; err != nil {
-			return err
-		}
-		(*courses)[i].HoursTotal = new(interface{})
-		if t.Valid {
-			*(*courses)[i].HoursTotal = t.String
-		} else {
-			var sum int
-			if (*courses)[i].HoursLecture != nil {
-				sum += *(*courses)[i].HoursLecture
-			}
-			if (*courses)[i].HoursPractices != nil {
-				sum += *(*courses)[i].HoursPractices
-			}
-			if (*courses)[i].HoursExperiment != nil {
-				sum += *(*courses)[i].HoursExperiment
-			}
-			if (*courses)[i].HoursComputer != nil {
-				sum += *(*courses)[i].HoursComputer
-			}
-			*(*courses)[i].HoursTotal = sum
-		}
-	}
-
 	return nil
 }
 
@@ -324,32 +230,32 @@ func (c *CourseService) GetCourseListQuery(page *model.Page, q *string, courses 
 		return err
 	}
 
-	for i := 0; i < len(*courses); i++ {
-		db := database.DB
-		var t sql.NullString
-		if err := db.Model(&model.Course{}).Where("id = ?", (*courses)[i].ID).Select("hours_total").Scan(&t).Error; err != nil {
-			return err
-		}
-		(*courses)[i].HoursTotal = new(interface{})
-		if t.Valid {
-			*(*courses)[i].HoursTotal = t.String
-		} else {
-			var sum int
-			if (*courses)[i].HoursLecture != nil {
-				sum += *(*courses)[i].HoursLecture
-			}
-			if (*courses)[i].HoursPractices != nil {
-				sum += *(*courses)[i].HoursPractices
-			}
-			if (*courses)[i].HoursExperiment != nil {
-				sum += *(*courses)[i].HoursExperiment
-			}
-			if (*courses)[i].HoursComputer != nil {
-				sum += *(*courses)[i].HoursComputer
-			}
-			*(*courses)[i].HoursTotal = sum
-		}
-	}
+	// for i := 0; i < len(*courses); i++ {
+	// 	db := database.DB
+	// 	var t sql.NullString
+	// 	if err := db.Model(&model.Course{}).Where("id = ?", (*courses)[i].ID).Select("hours_total").Scan(&t).Error; err != nil {
+	// 		return err
+	// 	}
+	// 	(*courses)[i].HoursTotal = new(interface{})
+	// 	if t.Valid {
+	// 		*(*courses)[i].HoursTotal = t.String
+	// 	} else {
+	// 		var sum int
+	// 		if (*courses)[i].HoursLecture != nil {
+	// 			sum += *(*courses)[i].HoursLecture
+	// 		}
+	// 		if (*courses)[i].HoursPractices != nil {
+	// 			sum += *(*courses)[i].HoursPractices
+	// 		}
+	// 		if (*courses)[i].HoursExperiment != nil {
+	// 			sum += *(*courses)[i].HoursExperiment
+	// 		}
+	// 		if (*courses)[i].HoursComputer != nil {
+	// 			sum += *(*courses)[i].HoursComputer
+	// 		}
+	// 		*(*courses)[i].HoursTotal = sum
+	// 	}
+	// }
 
 	return nil
 }
@@ -527,13 +433,10 @@ func (c *CourseService) ImportFile(file []byte, sun *uint, errs *[]string) error
 					course.Credit = nil
 				}
 			case 4:
-				course.HoursTotal = new(interface{})
-				*course.HoursTotal, err = cell.Int()
-				if err != nil {
-					*course.HoursTotal = cell.String()
-					if *course.HoursTotal == "" {
-						*course.HoursTotal = nil
-					}
+				course.HoursTotal = new(string)
+				*course.HoursTotal = cell.String()
+				if *course.HoursTotal == "" {
+					course.HoursTotal = nil
 				}
 			case 5:
 				course.HoursLecture = new(int)
@@ -599,37 +502,10 @@ func (c *CourseService) ImportFile(file []byte, sun *uint, errs *[]string) error
 		}
 
 		if course.Code == nil || course.Name == nil || course.ForeignName == nil || course.Credit == nil ||
-			*course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil ||
+			course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil ||
 			course.LeaderName == nil {
 			*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 必填字段不能为空")
 			continue
-		}
-
-		t, ok := (*course.HoursTotal).(int)
-		if ok {
-			var sum int
-			if course.HoursLecture != nil {
-				sum += *course.HoursLecture
-			}
-			if course.HoursPractices != nil {
-				sum += *course.HoursPractices
-			}
-			if course.HoursExperiment != nil {
-				sum += *course.HoursExperiment
-			}
-			if course.HoursComputer != nil {
-				sum += *course.HoursComputer
-			}
-			if t != sum {
-				*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 总学时不等于其他学时之和")
-				continue
-			}
-		} else {
-			if !(course.HoursLecture == nil && course.HoursPractices == nil &&
-				course.HoursExperiment == nil && course.HoursComputer == nil) {
-				*errs = append(*errs, "L"+fmt.Sprintf("%d", i+1)+": 学时设置不正确")
-				continue
-			}
 		}
 
 		switch *course.Assessment {

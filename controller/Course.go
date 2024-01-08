@@ -24,46 +24,13 @@ func (c *CourseController) CreateCourse(ctx *gin.Context) {
 	}
 
 	if course.Code == nil || course.Name == nil || course.ForeignName == nil || course.Credit == nil ||
-		*course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil ||
+		course.HoursTotal == nil || course.Assessment == nil || course.DepartmentName == nil ||
 		course.LeaderName == nil {
 		ctx.JSON(http.StatusBadRequest, model.Response{
 			Code: 1001,
 			Msg:  "Required fields cannot be empty.",
 		})
 		return
-	}
-
-	t, ok := (*course.HoursTotal).(int)
-	if ok {
-		var sum int
-		if course.HoursLecture != nil {
-			sum += *course.HoursLecture
-		}
-		if course.HoursPractices != nil {
-			sum += *course.HoursPractices
-		}
-		if course.HoursExperiment != nil {
-			sum += *course.HoursExperiment
-		}
-		if course.HoursComputer != nil {
-			sum += *course.HoursComputer
-		}
-		if t != sum {
-			ctx.JSON(http.StatusBadRequest, model.Response{
-				Code: 1001,
-				Msg:  "Hours total is not equal to the sum of other hours.",
-			})
-			return
-		}
-	} else {
-		if !(course.HoursLecture == nil && course.HoursPractices == nil &&
-			course.HoursExperiment == nil && course.HoursComputer == nil) {
-			ctx.JSON(http.StatusBadRequest, model.Response{
-				Code: 1001,
-				Msg:  "Hours not set properly.",
-			})
-			return
-		}
 	}
 
 	cs := &service.CourseService{}
@@ -129,13 +96,6 @@ func (c *CourseController) UpdateCourse(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, model.Response{
 				Code: 1001,
 				Msg:  "Course not found.",
-			})
-			return
-		}
-		if err.Error() == "errHoursTotal" {
-			ctx.JSON(http.StatusBadRequest, model.Response{
-				Code: 1001,
-				Msg:  "Hours not set properly.",
 			})
 			return
 		}
